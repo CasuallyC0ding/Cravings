@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Cravings"
+        tools:targetApi="31">
+
+        <!-- Login screen (main entry point) -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="Login"
+            android:theme="@style/Theme.Cravings">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Registration screen -->
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:label="Register" />
+
+        <!-- Home screen -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:label="Cravings Home" />
+
+        <!-- Optional: MainActivity if you still have it for testing -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="Main" />
+
+    </application>
+
+</manifest>

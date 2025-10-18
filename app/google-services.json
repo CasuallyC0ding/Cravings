@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "897790089819",
+    "project_id": "dbcravings",
+    "storage_bucket": "dbcravings.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897790089819:android:fd720d2c3cf702996ffd7e",
+        "android_client_info": {
+          "package_name": "com.example.cravings"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIt0t_pjA5DX26mcZMTkXAoR8Jxq7_Mew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

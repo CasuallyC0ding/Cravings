@@ -1,0 +1,134 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/food_bg"
+        android:contentDescription="Background" />
+
+    <!-- Dark gradient overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/dark_gradient_overlay" />
+
+    <!-- Foreground layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/appTitle"
+            android:text="Cravings"
+            android:textSize="56sp"
+            android:fontFamily="@font/pacifico"
+            android:textColor="#FF6F00"
+            android:layout_marginBottom="24dp"
+            android:shadowColor="#80000000"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="6"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Center Card -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp"
+            android:elevation="8dp"
+            android:gravity="center_horizontal"
+            android:layout_margin="16dp"
+            android:clipToOutline="true"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_card">
+
+            <!-- Name -->
+            <EditText
+                android:id="@+id/nameInput"
+                android:hint="Full Name"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#AAAAAA"
+                android:background="@drawable/rounded_input"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp"
+                android:inputType="textPersonName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Phone -->
+            <EditText
+                android:id="@+id/phoneInput"
+                android:hint="Phone Number"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#AAAAAA"
+                android:background="@drawable/rounded_input"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp"
+                android:inputType="phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Email -->
+            <EditText
+                android:id="@+id/emailInput"
+                android:hint="Email"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#AAAAAA"
+                android:background="@drawable/rounded_input"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp"
+                android:inputType="textEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Password -->
+            <EditText
+                android:id="@+id/passwordInput"
+                android:hint="Password"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#AAAAAA"
+                android:background="@drawable/rounded_input"
+                android:padding="14dp"
+                android:layout_marginBottom="20dp"
+                android:inputType="textPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Sign Up Button -->
+            <Button
+                android:id="@+id/signupBtn"
+                android:text="Create Account"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gradient_button"
+                android:elevation="6dp"
+                android:padding="14dp" />
+        </LinearLayout>
+
+        <!-- Login Redirect -->
+        <TextView
+            android:id="@+id/loginRedirect"
+            android:text="Already have an account? Log in"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>
