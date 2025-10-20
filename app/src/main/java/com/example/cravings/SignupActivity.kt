@@ -21,6 +21,7 @@ class SignupActivity : AppCompatActivity() {
         // ✅ Explicitly connect to your database URL
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
+        val userRole = intent.getStringExtra("userRole")
         val nameInput = findViewById<EditText>(R.id.nameInput)
         val phoneInput = findViewById<EditText>(R.id.phoneInput)
         val emailInput = findViewById<EditText>(R.id.emailInput)
@@ -58,27 +59,36 @@ class SignupActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+
                         val userMap = mapOf(
                             "name" to name,
                             "phone" to phone,
                             "email" to email
                         )
 
-                        database.reference.child("users").child(uid).setValue(userMap)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Account created successfully! Please log in.", Toast.LENGTH_SHORT).show()
-                                auth.signOut()
-                                startActivity(Intent(this, LoginActivity::class.java))
-                                finish()
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Failed to save user: ${e.message}", Toast.LENGTH_LONG).show()
-                            }
+                        // Save under users → Merchant or Customer → UID
+                        if (userRole != null) {
+                            database.reference.child("users").child(userRole).child(uid).setValue(userMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Account created successfully! Please log in.", Toast.LENGTH_SHORT).show()
+                                    auth.signOut()
+
+                                    val intent = Intent(this, LoginActivity::class.java)
+                                    intent.putExtra("userRole", userRole) // Pass role back to Login screen
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this, "Failed to save user: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+                        }
                     } else {
                         val error = task.exception?.message ?: "Signup failed"
                         Toast.makeText(this, "Error: $error", Toast.LENGTH_LONG).show()
                     }
                 }
+
+
         }
 
         loginRedirect.setOnClickListener {

@@ -17,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
+        val userRole = intent.getStringExtra("userRole")
         auth = FirebaseAuth.getInstance()
 
         // ✅ Skip login if user is already signed in
@@ -57,7 +57,9 @@ class LoginActivity : AppCompatActivity() {
 
         // Go to registration screen
         registerLink.setOnClickListener {
-            startActivity(Intent(this, SignupActivity::class.java))
+            val intent = Intent(this, SignupActivity::class.java)
+            intent.putExtra("userRole", userRole) // 🔹 Pass the same variable forward
+            startActivity(intent)
         }
     }
 }
