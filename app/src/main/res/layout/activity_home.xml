@@ -41,6 +41,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <!-- Profile Picture Section -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_profile_placeholder"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle_background"
+                android:clipToOutline="true" />
+
+            <ImageButton
+                android:id="@+id/editProfileBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="-20dp"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_edit"
+                android:contentDescription="Edit Profile Picture" />
+        </LinearLayout>
+
+
         <!-- Greeting -->
         <TextView
             android:id="@+id/greetingText"

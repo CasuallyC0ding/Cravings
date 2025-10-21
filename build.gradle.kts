@@ -5,10 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
 }
 buildscript {
-//    repositories {
-//        google()
-//        mavenCentral()
-//    }
+    repositories {
+        google()
+        mavenCentral()
+    }
     dependencies {
         classpath("com.android.tools.build:gradle:8.9.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25")
