@@ -11,18 +11,18 @@ import com.google.firebase.database.*
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var database: DatabaseReference
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        val userRole = intent.getStringExtra("userRole")
 
         auth = FirebaseAuth.getInstance()
 
         // ✅ Explicitly connect to your database URL
-        database = FirebaseDatabase.getInstance(
-            "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
-        ).reference
+        database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
+
 
         val greetingText = findViewById<TextView>(R.id.greetingText)
         val nameInput = findViewById<EditText>(R.id.nameInput)
@@ -31,7 +31,7 @@ class HomeActivity : AppCompatActivity() {
         val signOutBtn = findViewById<Button>(R.id.signOutBtn)
 
         val uid = auth.currentUser?.uid
-        if (uid == null) {
+        if (uid == null|| userRole == null) {
             Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         // ✅ Load user data from Firebase
-        database.child("users").child(uid)
+        database.reference.child("users").child(userRole).child(uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -71,7 +71,7 @@ class HomeActivity : AppCompatActivity() {
             }
 
             val updates = mapOf("name" to updatedName, "phone" to updatedPhone)
-            database.child("users").child(uid).updateChildren(updates)
+            database.reference.child("users").child(userRole).child(uid).updateChildren(updates)
                 .addOnSuccessListener {
                     val firstName = updatedName.split(" ").firstOrNull() ?: updatedName
                     greetingText.text = "Hello, $firstName 👋"
@@ -90,7 +90,7 @@ class HomeActivity : AppCompatActivity() {
                 .setMessage("Are you sure you want to log out?")
                 .setPositiveButton("Yes") { _, _ ->
                     auth.signOut()
-                    startActivity(Intent(this, LoginActivity::class.java))
+                    startActivity(Intent(this, RoleSelectionActivity::class.java))
                     finish()
                 }
                 .setNegativeButton("Cancel", null)
