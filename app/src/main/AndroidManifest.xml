@@ -39,7 +39,7 @@
 
         <!-- Home screen -->
         <activity
-            android:name=".HomeActivity"
+            android:name=".ProfileActivity"
             android:exported="false"
             android:label="Cravings Home" />
 

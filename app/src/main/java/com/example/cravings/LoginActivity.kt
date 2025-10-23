@@ -64,7 +64,7 @@
                             .addOnSuccessListener { snapshot ->
                                 if (snapshot.exists()) {
                                     Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
-                                    val intent = Intent(this, HomeActivity::class.java)
+                                    val intent = Intent(this, ProfileActivity::class.java)
                                     intent.putExtra("userRole", userRole)
                                     startActivity(intent)
                                     finish()
