@@ -13,9 +13,11 @@
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
         <activity
-            android:name=".HomeMerchantActivity"
+            android:name=".HomeCustomerActivity"
             android:exported="false" />
-        <!-- Role Selection screen (main entry point) -->
+        <activity
+            android:name=".HomeMerchantActivity"
+            android:exported="false" /> <!-- Role Selection screen (main entry point) -->
         <activity
             android:name=".RoleSelectionActivity"
             android:exported="true"

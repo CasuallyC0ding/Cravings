@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".HomeMerchantActivity">
+    tools:context=".HomeCustomerActivity">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -18,7 +18,7 @@
             android:id="@+id/roleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MERCHANT"
+            android:text="CUSTOMER"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_weight="1"
@@ -38,7 +38,7 @@
         android:id="@+id/welcomeText"
         android:layout_below="@id/topBar"
         android:layout_marginTop="40dp"
-        android:text="Welcome to Merchant Home!"
+        android:text="Welcome to Customer Home!"
         android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

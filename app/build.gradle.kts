@@ -2,9 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
-}
 
+    id("com.google.gms.google-services")
+    kotlin("kapt")
+}
 
 android {
     namespace = "com.example.cravings"
@@ -29,38 +30,55 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+        viewBinding = true // ✅ For XML view access if you use traditional layouts
     }
 }
 
 dependencies {
-
+    // ✅ Core AndroidX
     implementation(libs.androidx.core.ktx.v1120)
-    implementation("androidx.appcompat:appcompat:1.7.0") // <- add this
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1") // if using ConstraintLayout
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0")) // ✅ Add this line
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
+    // ✅ Firebase (use the BoM to keep versions in sync)
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-storage")
 
-    implementation(libs.androidx.core.ktx)
+    // ✅ Glide (for loading AWS / profile images)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // ✅ CircleImageView (optional, for rounded avatars)
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // ✅ Lifecycle + Activity
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity)
+
+    // ✅ Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.activity)
+
+    // ✅ Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
