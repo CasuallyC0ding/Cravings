@@ -59,11 +59,12 @@
                     .addOnSuccessListener { result ->
                         val userId = result.user?.uid ?: return@addOnSuccessListener
 
-
+                        // we pass in the role
                         database.reference.child("users").child(userRole).child(userId).get()
                             .addOnSuccessListener { snapshot ->
                                 if (snapshot.exists()) {
                                     Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
+                                    // we pass in the role
                                     val intent = Intent(this, ProfileActivity::class.java)
                                     intent.putExtra("userRole", userRole)
                                     startActivity(intent)

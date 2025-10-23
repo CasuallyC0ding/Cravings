@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
-
+        <activity
+            android:name=".HomeMerchantActivity"
+            android:exported="false" />
         <!-- Role Selection screen (main entry point) -->
         <activity
             android:name=".RoleSelectionActivity"
@@ -20,35 +22,27 @@
             android:label="Cravings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Login screen -->
+        </activity> <!-- Login screen -->
         <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:label="Login"
-            android:theme="@style/Theme.Cravings" />
-
-        <!-- Registration screen -->
+            android:theme="@style/Theme.Cravings" /> <!-- Registration screen -->
         <activity
             android:name=".SignupActivity"
             android:exported="false"
-            android:label="Register" />
-
-        <!-- Home screen -->
+            android:label="Register" /> <!-- Home screen -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false"
-            android:label="Cravings Home" />
-
-        <!-- Optional: MainActivity (if still used for testing) -->
+            android:label="Cravings Home" /> <!-- Optional: MainActivity (if still used for testing) -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:label="Main" />
-
     </application>
 
 </manifest>
