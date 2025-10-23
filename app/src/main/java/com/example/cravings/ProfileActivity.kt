@@ -7,17 +7,36 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import android.net.Uri
+import com.amazonaws.ClientConfiguration
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferNetworkLossHandler
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
+import com.amazonaws.regions.Region
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3Client
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private var userRole: String? = null  // ✅ declared safely here
+
+    companion object {
+        private const val AWS_ACCESS_KEY = ""
+        private const val AWS_SECRET_KEY = ""
+        private const val BUCKET_NAME = "craversbkt"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val userRole = intent.getStringExtra("userRole")
+        // ✅ Safe to access intent now
+        userRole = intent.getStringExtra("userRole")
+
         auth = FirebaseAuth.getInstance()
         database =
             FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
@@ -29,6 +48,13 @@ class ProfileActivity : AppCompatActivity() {
         val shopNameLabel = findViewById<TextView>(R.id.shopNameLabel)
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         val signOutBtn = findViewById<Button>(R.id.signOutBtn)
+        val editProfileBtn = findViewById<ImageButton>(R.id.editProfileBtn)
+
+        editProfileBtn.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, 1001)
+        }
 
         val uid = auth.currentUser?.uid
         if (uid == null || userRole == null) {
@@ -38,14 +64,17 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Show shop name only if user is Merchant
+        // ✅ Show shop name only for merchants
         if (userRole == "Merchant") {
             shopNameInput.visibility = android.view.View.VISIBLE
             shopNameLabel.visibility = android.view.View.VISIBLE
+        } else {
+            shopNameInput.visibility = android.view.View.GONE
+            shopNameLabel.visibility = android.view.View.GONE
         }
 
-        // ✅ Load user data
-        database.reference.child("users").child(userRole).child(uid)
+        // ✅ Load user data from Firebase
+        database.reference.child("users").child(userRole!!).child(uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -57,6 +86,7 @@ class ProfileActivity : AppCompatActivity() {
                         greetingText.text = "Hello, $firstName 👋"
                         nameInput.setText(name)
                         phoneInput.setText(phone)
+
                         if (userRole == "Merchant") {
                             shopNameInput.setText(shopName)
                         }
@@ -91,7 +121,7 @@ class ProfileActivity : AppCompatActivity() {
                 "phone" to updatedPhone
             )
 
-            // ✅ Add shop name if user is Merchant
+            // ✅ Add shop name if merchant
             if (userRole == "Merchant") {
                 val updatedShopName = shopNameInput.text.toString().trim()
                 if (updatedShopName.isEmpty()) {
@@ -101,7 +131,7 @@ class ProfileActivity : AppCompatActivity() {
                 updates["shopName"] = updatedShopName
             }
 
-            database.reference.child("users").child(userRole).child(uid).updateChildren(updates)
+            database.reference.child("users").child(userRole!!).child(uid).updateChildren(updates)
                 .addOnSuccessListener {
                     val firstName = updatedName.split(" ").firstOrNull() ?: updatedName
                     greetingText.text = "Hello, $firstName 👋"
@@ -125,5 +155,80 @@ class ProfileActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
+    }
+
+    // ✅ Handle image selection
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            val imageUri = data.data
+            if (imageUri != null) {
+                findViewById<ImageView>(R.id.profileImage).setImageURI(imageUri)
+                uploadToS3(imageUri)
+            }
+        }
+    }
+
+    private fun uploadToS3(uri: Uri) {
+        val uid = auth.currentUser?.uid ?: return
+        val file = getFileFromUri(uri) ?: run {
+            Toast.makeText(this, "Failed to read file", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val credentials = BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+        val s3 = AmazonS3Client(credentials, Region.getRegion(Regions.EU_WEST_1))
+        s3.setRegion(Region.getRegion(Regions.EU_NORTH_1))
+
+        // ✅ Initialize the TransferNetworkLossHandler here
+        TransferNetworkLossHandler.getInstance(applicationContext)
+
+        val transferUtility = TransferUtility.builder()
+            .context(applicationContext)
+            .s3Client(s3)
+            .defaultBucket("craversbkt")
+            .build()
+
+        val key = "profile_pictures/$uid.jpg"
+        val uploadObserver = transferUtility.upload(BUCKET_NAME, key, file)
+
+        uploadObserver.setTransferListener(object : TransferListener {
+            override fun onStateChanged(id: Int, state: TransferState?) {
+                if (state == TransferState.COMPLETED) {
+                    val imageUrl = s3.getResourceUrl(BUCKET_NAME, key)
+                    if (userRole != null) {
+                        database.reference.child("users").child(userRole!!).child(uid)
+                            .child("profileImage").setValue(imageUrl)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this@ProfileActivity,
+                                    "Profile picture updated!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                    }
+                }
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {}
+            override fun onError(id: Int, ex: Exception?) {
+                Toast.makeText(
+                    this@ProfileActivity,
+                    "Upload failed: ${ex?.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
+    }
+
+
+    private fun getFileFromUri(uri: Uri): java.io.File? {
+        val inputStream = contentResolver.openInputStream(uri) ?: return null
+        val file = java.io.File(cacheDir, "temp_${System.currentTimeMillis()}.jpg")
+        val outputStream = java.io.FileOutputStream(file)
+        inputStream.copyTo(outputStream)
+        outputStream.close()
+        inputStream.close()
+        return file
     }
 }
