@@ -29,7 +29,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="end"
-            android:src="@drawable/ic_profile"
+            android:src="@drawable/ic_profile_placeholder"
             android:contentDescription="Profile" />
     </LinearLayout>
 

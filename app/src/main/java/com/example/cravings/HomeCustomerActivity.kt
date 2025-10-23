@@ -27,7 +27,7 @@ class HomeCustomerActivity : AppCompatActivity() {
         val imageUrl = "https://via.placeholder.com/150" // Replace later with AWS S3 URL
         Glide.with(this)
             .load(imageUrl)
-            .placeholder(R.drawable.ic_profile)
+            .placeholder(R.drawable.ic_profile_placeholder)
             .into(profileButton)
 
         // Open ProfileActivity on click

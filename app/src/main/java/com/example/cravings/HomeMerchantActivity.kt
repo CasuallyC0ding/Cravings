@@ -27,7 +27,7 @@ class HomeMerchantActivity : AppCompatActivity() {
         val imageUrl = "https://via.placeholder.com/150"
         Glide.with(this)
             .load(imageUrl)
-            .placeholder(R.drawable.ic_profile)
+            .placeholder(R.drawable.ic_profile_placeholder)
             .into(profileButton)
 
         // When profile is clicked → go to ProfileActivity

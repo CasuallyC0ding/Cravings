@@ -89,6 +89,7 @@
                     }
             }
 
+
             // 🔹 Go to registration screen
             registerLink.setOnClickListener {
                 val intent = Intent(this, SignupActivity::class.java)
