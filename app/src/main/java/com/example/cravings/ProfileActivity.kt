@@ -26,8 +26,8 @@ class ProfileActivity : AppCompatActivity() {
     private var userRole: String? = null
 
     companion object {
-        private const val AWS_ACCESS_KEY = ""
-        private const val AWS_SECRET_KEY = ""
+       // private const val AWS_ACCESS_KEY = ""
+       //  private const val AWS_SECRET_KEY = ""
         private const val BUCKET_NAME = "craversbkt"
     }
 
