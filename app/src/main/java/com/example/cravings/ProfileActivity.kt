@@ -26,8 +26,8 @@ class ProfileActivity : AppCompatActivity() {
     private var userRole: String? = null
 
     companion object {
-        private const val AWS_ACCESS_KEY = ""
-        private const val AWS_SECRET_KEY = ""
+        private const val AWS_ACCESS_KEY = "AKIA6GUTHW7WYQ5CO7GP"
+        private const val AWS_SECRET_KEY = "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"
         private const val BUCKET_NAME = "craversbkt"
     }
 
@@ -97,6 +97,8 @@ class ProfileActivity : AppCompatActivity() {
                             Glide.with(this@ProfileActivity)
                                 .load(imageUrl)
                                 .placeholder(R.drawable.ic_profile_placeholder) // optional placeholder
+                                .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE) // Disable disk caching
+                                .skipMemoryCache(true) // Disable memory caching
                                 .into(profileImageView)
                         }
                     } else {
@@ -193,7 +195,7 @@ class ProfileActivity : AppCompatActivity() {
                 if (state == TransferState.COMPLETED) {
                     val imageUrl = s3.getResourceUrl(BUCKET_NAME, key)
                     val userRef = database.reference.child("users").child(userRole!!).child(uid)
-                    val updates = mapOf("profileImage" to imageUrl, "profilePicUrl" to imageUrl)
+                    val updates = mapOf("profileImage" to imageUrl)
                     userRef.updateChildren(updates)
                 }
             }

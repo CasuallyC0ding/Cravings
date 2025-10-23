@@ -68,7 +68,6 @@
                 android:contentDescription="Edit Profile Picture" />
         </LinearLayout>
 
-
         <!-- Greeting -->
         <TextView
             android:id="@+id/greetingText"
@@ -82,120 +81,127 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <!-- Profile Card -->
+        <!-- Card container -->
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_card"
             android:padding="24dp"
             android:elevation="8dp"
-            android:gravity="center_horizontal"
-            android:layout_margin="16dp"
-            android:clipToOutline="true"
-            android:background="@drawable/rounded_card">
+            android:layout_margin="16dp">
 
-            <!-- Name label -->
-            <TextView
-                android:text="Full Name"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp" />
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:scrollbars="none">
 
-            <!-- Name input -->
-            <EditText
-                android:id="@+id/nameInput"
-                android:hint="Enter your name"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#AAAAAA"
-                android:background="@drawable/rounded_input"
-                android:padding="14dp"
-                android:layout_marginBottom="16dp"
-                android:inputType="textPersonName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <!-- Phone label -->
-            <TextView
-                android:text="Phone Number"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp" />
+                    <!-- Name label -->
+                    <TextView
+                        android:text="Full Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp" />
 
-            <!-- Phone input -->
-            <EditText
-                android:id="@+id/phoneInput"
-                android:hint="Enter your phone number"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#AAAAAA"
-                android:background="@drawable/rounded_input"
-                android:padding="14dp"
-                android:layout_marginBottom="24dp"
-                android:inputType="phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                    <EditText
+                        android:id="@+id/nameInput"
+                        android:hint="Enter your name"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA"
+                        android:background="@drawable/rounded_input"
+                        android:padding="14dp"
+                        android:layout_marginBottom="16dp"
+                        android:inputType="textPersonName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
+                    <!-- Phone -->
+                    <TextView
+                        android:text="Phone Number"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp" />
 
+                    <EditText
+                        android:id="@+id/phoneInput"
+                        android:hint="Enter your phone number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA"
+                        android:background="@drawable/rounded_input"
+                        android:padding="14dp"
+                        android:layout_marginBottom="24dp"
+                        android:inputType="phone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-            <!-- Shop Name label -->
-            <TextView
-                android:id="@+id/shopNameLabel"
-                android:text="Shop Name"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:visibility="gone" />
+                    <!-- Shop Name -->
+                    <TextView
+                        android:id="@+id/shopNameLabel"
+                        android:text="Shop Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone" />
 
-            <!-- Shop Name input -->
-            <EditText
-                android:id="@+id/shopNameInput"
-                android:hint="Enter your shop name"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#AAAAAA"
-                android:background="@drawable/rounded_input"
-                android:padding="14dp"
-                android:layout_marginBottom="24dp"
-                android:inputType="textPersonName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                    <EditText
+                        android:id="@+id/shopNameInput"
+                        android:hint="Enter your shop name"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA"
+                        android:background="@drawable/rounded_input"
+                        android:padding="14dp"
+                        android:layout_marginBottom="24dp"
+                        android:inputType="textPersonName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
 
+                    <!-- Save button -->
+                    <Button
+                        android:id="@+id/saveBtn"
+                        android:text="Save Changes"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/btn_orange_gradient"
+                        android:elevation="6dp"
+                        android:padding="14dp"
+                        android:layout_marginBottom="14dp" />
 
-            <!-- Save button (vibrant orange gradient) -->
-            <Button
-                android:id="@+id/saveBtn"
-                android:text="Save Changes"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_orange_gradient"
-                android:elevation="6dp"
-                android:padding="14dp"
-                android:layout_marginBottom="14dp" />
+                    <!-- Sign Out button -->
+                    <Button
+                        android:id="@+id/signOutBtn"
+                        android:text="Sign Out"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/btn_red_gradient"
+                        android:elevation="6dp"
+                        android:padding="14dp" />
 
-            <!-- Sign Out button (vibrant red gradient) -->
-            <Button
-                android:id="@+id/signOutBtn"
-                android:text="Sign Out"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_red_gradient"
-                android:elevation="6dp"
-                android:padding="14dp" />
+                </LinearLayout>
+            </ScrollView>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
