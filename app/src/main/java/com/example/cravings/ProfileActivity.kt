@@ -26,7 +26,7 @@ class ProfileActivity : AppCompatActivity() {
     private var userRole: String? = null
 
     companion object {
-// insert keyss here
+    // insert here
         private const val BUCKET_NAME = "craversbkt"
     }
 
