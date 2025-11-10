@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
 
     <application
         android:allowBackup="true"
@@ -17,14 +17,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
-
-        <!-- Role Selection screen (main entry point) -->
+        <activity
+            android:name=".EditProducts"
+            android:exported="false" />
+        <activity
+            android:name=".AddProduct"
+            android:exported="false" />
+        <activity
+            android:name=".ProductActivity"
+            android:exported="false" /> <!-- Role Selection screen (main entry point) -->
         <activity
             android:name=".RoleSelectionActivity"
             android:exported="true"
             android:label="Cravings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -39,26 +47,19 @@
             android:name=".LoginActivity"
             android:exported="false"
             android:label="Login"
-            android:theme="@style/Theme.Cravings" />
-
-        <!-- Registration screen -->
+            android:theme="@style/Theme.Cravings" /> <!-- Registration screen -->
         <activity
             android:name=".SignupActivity"
             android:exported="false"
-            android:label="Register" />
-
-        <!-- Home screen -->
+            android:label="Register" /> <!-- Home screen -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false"
-            android:label="Cravings Home" />
-
-        <!-- Optional: MainActivity (if still used for testing) -->
+            android:label="Cravings Home" /> <!-- Optional: MainActivity (if still used for testing) -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:label="Main" />
-
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.example.cravings
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +19,9 @@ class HomeMerchantActivity : AppCompatActivity() {
     private lateinit var roleTextView: TextView
     private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
+
+    private lateinit var manageProductsButton: Button
+
     private var userRole: String = "Merchant"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +52,11 @@ class HomeMerchantActivity : AppCompatActivity() {
             intent.putExtra("userRole", userRole)
             startActivity(intent)
         }
+        manageProductsButton.setOnClickListener {
+            val intent = Intent(this, ProductActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     // 🔁 Refresh profile image each time user returns
