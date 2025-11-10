@@ -1,6 +1,5 @@
 package com.example.cravings.adapters
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ class ShopAdapter(private val shopList: List<Shop>) :
     class ShopViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val shopImage: ImageView = itemView.findViewById(R.id.shopImage)
         val shopName: TextView = itemView.findViewById(R.id.shopName)
-        val shopDescription: TextView = itemView.findViewById(R.id.shopDescription)
+       // val shopDescription: TextView = itemView.findViewById(R.id.shopDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
@@ -28,30 +27,17 @@ class ShopAdapter(private val shopList: List<Shop>) :
 
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
-        holder.shopName.text = shop.shopName
-        //holder.shopDescription.text = shop.description
 
-        if (!shop.profileImage.isNullOrEmpty()){
+        holder.shopName.text = shop.shopName
+      //  holder.shopDescription.text = shop.description ?: ""
+
+        val imageUrl = shop.profileImage
+
         Glide.with(holder.itemView.context)
-            .load(shop.profileImage)
+            .load(imageUrl)
             .placeholder(R.drawable.ic_profile_placeholder)
             .error(R.drawable.ic_profile_placeholder)
             .into(holder.shopImage)
-    }
-        else{
-            holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
-        }
-
-
-
-        holder.itemView.setOnClickListener {
-          //  val context = holder. itemView. context
-           // val intent = Intent( packageContext = context,cls = ShopMenuActivity:: class. java)
-            //    context.startActivity(intent)
-
-
-
-        }
     }
 
     override fun getItemCount(): Int = shopList.size

@@ -6,7 +6,6 @@ plugins {
     kotlin("kapt")
 }
 
-
 android {
     namespace = "com.example.cravings"
     compileSdk = 36
@@ -30,13 +29,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         viewBinding = true
@@ -46,23 +48,21 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx.v1120)
-    implementation("androidx.appcompat:appcompat:1.7.0") // <- add this
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1") // if using ConstraintLayout
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0")) // ✅ Add this line
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
 
-    implementation ("com.amazonaws:aws-android-sdk-s3:2.73.0")
+    implementation("com.amazonaws:aws-android-sdk-s3:2.73.0")
 
-
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.recyclerview)
 
     kapt("com.github.bumptech.glide:compiler:4.16.0")
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -76,7 +76,6 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,69 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeCustomerActivity">
+    android:layout_height="match_parent">
 
-    <!-- Background image -->
+    <!-- Background -->
     <ImageView
         android:id="@+id/bgImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg"
-        android:contentDescription="Background" />
+        android:src="@drawable/food_pattern_bg_light" />
 
-    <!-- Dark gradient overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
-
-    <!-- 🟠 Top Bar (CUSTOMER text + Profile picture) -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp">
-
-        <TextView
-            android:id="@+id/roleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CUSTOMER"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFD180"
-            android:layout_weight="1"
-            android:fontFamily="@font/dancing_script_semibold" />
-
-        <ImageView
-            android:id="@+id/profileButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_profile_placeholder"
-            android:background="@drawable/circle_background"
-            android:clipToOutline="true"
-            android:contentDescription="Profile" />
-    </LinearLayout>
-
-    <!-- ViewPager2: holds the 3 fragments (Home, Orders, Account) -->
+    <!-- ViewPager fills whole screen now -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:layout_above="@id/tabLayout"
-        android:layout_marginTop="8dp" />
+        android:layout_above="@id/tabLayout"/>
 
-    <!-- Bottom Tab Layout (orange navigation bar) -->
+    <!-- Bottom Tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
@@ -72,8 +28,6 @@
         android:background="@drawable/btn_orange_gradient"
         app:tabIconTint="@color/nav_item_color"
         app:tabTextColor="@color/nav_item_color"
-        app:tabIndicatorColor="#FFFFFF"
-        app:tabGravity="fill"
-        app:tabMode="fixed" />
+        app:tabIndicatorColor="#FFFFFF" />
 
 </RelativeLayout>
