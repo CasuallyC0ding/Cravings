@@ -10,6 +10,18 @@
         android:scaleType="centerCrop"
         android:contentDescription="Background" />
 
+    <TextView
+        android:id="@+id/loginRoleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CUSTOMER"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#FF6F00"
+        android:fontFamily="@font/dancing_script_semibold"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
     <!-- Centered card -->
     <LinearLayout
         android:layout_width="300dp"
@@ -32,6 +44,7 @@
             android:paddingBottom="24dp"
             android:fontFamily="@font/pacifico" />
 
+
         <!-- Email field -->
         <EditText
             android:id="@+id/emailInput"
@@ -41,6 +54,7 @@
             android:layout_height="50dp"
             android:background="@drawable/rounded_input"
             android:paddingStart="16dp"
+            android:textColor="#FFFFFF"
             android:paddingEnd="16dp"
             android:layout_marginBottom="16dp"/>
 
@@ -53,6 +67,7 @@
             android:layout_height="50dp"
             android:background="@drawable/rounded_input"
             android:paddingStart="16dp"
+            android:textColor="#FFFFFF"
             android:paddingEnd="16dp"
             android:layout_marginBottom="16dp"/>
 
