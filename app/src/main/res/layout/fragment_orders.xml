@@ -11,6 +11,12 @@
         android:src="@drawable/food_pattern_bg_light"
         android:contentDescription="Background" />
 
+    <!-- Dark gradient overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/dark_gradient_overlay" />
+
     <!-- Foreground content -->
     <LinearLayout
         android:layout_width="match_parent"

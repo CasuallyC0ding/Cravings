@@ -16,18 +16,11 @@ class ViewPagerAdapter(
     override fun getItemCount(): Int = 3
 
     override fun createFragment(position: Int): Fragment {
-        val fragment = when (position) {
-            0 -> ShopsFragment()
-            1 -> OrdersFragment()
-            2 -> AccountFragment()
-            else -> ShopsFragment()
+        return when (position) {
+            0 -> ShopsFragment.newInstance(userRole)
+            1 -> OrdersFragment.newInstance(userRole)
+            2 -> AccountFragment.newInstance(userRole)
+            else -> ShopsFragment.newInstance(userRole)
         }
-
-        // ✅ Pass userRole to fragment
-        fragment.arguments = Bundle().apply {
-            putString("userRole", userRole)
-        }
-
-        return fragment
     }
 }

@@ -11,6 +11,12 @@
         android:src="@drawable/food_pattern_bg_light"
         android:contentDescription="Background" />
 
+    <!-- Dark gradient overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/dark_gradient_overlay" />
+
     <!-- 🟠 Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
@@ -22,16 +28,17 @@
         android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp">
 
+        <!-- ✅ FIX: ADD THIS BACK -->
         <TextView
             android:id="@+id/roleText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="CUSTOMER"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFD180"
             android:layout_weight="1"
-            android:fontFamily="@font/dancing_script_semibold" />
+            android:text="Welcome"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#0A2239"
+            android:fontFamily="sans-serif-medium" />
 
         <ImageView
             android:id="@+id/profileButton"
@@ -52,9 +59,10 @@
         android:padding="24dp">
 
         <TextView
+            android:id="@+id/accountTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to Account!"
+            android:text="Account Page"
             android:textColor="#FFD180"
             android:textSize="24sp"
             android:textStyle="bold"

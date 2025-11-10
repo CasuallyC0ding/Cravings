@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.cravings.R
 import com.example.cravings.baseActivities.ShopProductsActivity
 import com.example.cravings.models.Shop
@@ -18,8 +19,6 @@ class ShopAdapter(private val shopList: List<Shop>) :
     class ShopViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val shopImage: ImageView = itemView.findViewById(R.id.shopImage)
         val shopName: TextView = itemView.findViewById(R.id.shopName)
-        // If your layout does not use shopDescription, we simply ignore it
-        // val shopDescription: TextView = itemView.findViewById(R.id.shopDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
@@ -31,25 +30,26 @@ class ShopAdapter(private val shopList: List<Shop>) :
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
 
-        // Name
         holder.shopName.text = shop.shopName
 
-        // Image
+        // ✅ Load image without making it circular
         if (!shop.profileImage.isNullOrEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(shop.profileImage)
                 .placeholder(R.drawable.ic_profile_placeholder)
                 .error(R.drawable.ic_profile_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.NONE) // prevent old cached photo
+                .skipMemoryCache(true)
                 .into(holder.shopImage)
         } else {
             holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
-        // ✅ Open shop details (ShopProductsActivity) when card clicked
+        // Open shop products page
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, ShopProductsActivity::class.java)
-            intent.putExtra("shopId", shop.uid)   // ensure model has `uid`
+            intent.putExtra("shopId", shop.uid)
             context.startActivity(intent)
         }
     }

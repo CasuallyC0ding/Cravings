@@ -39,12 +39,14 @@
                 android:id="@+id/roleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CUSTOMER"
-                android:textSize="20sp"
+                android:text="Welcome back"
+                android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="#FFD180"
+                android:textColor="#0A2239"
                 android:layout_weight="1"
-                android:fontFamily="@font/dancing_script_semibold" />
+                android:gravity="start"
+                android:fontFamily="sans-serif-medium" />
+
 
             <ImageView
                 android:id="@+id/profileButton"
@@ -61,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nearby Shops"
-            android:textColor="#FFD180"
+            android:textColor="#FBEFD9"
             android:textSize="24sp"
             android:textStyle="bold"
             android:fontFamily="@font/dancing_script_semibold"

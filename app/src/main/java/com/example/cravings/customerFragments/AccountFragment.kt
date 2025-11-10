@@ -7,11 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.cravings.baseActivities.ProfileActivity
 import com.example.cravings.R
+import com.example.cravings.baseActivities.ProfileActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -21,61 +20,61 @@ class AccountFragment : Fragment() {
     private lateinit var profileButton: ImageView
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
-    private var userRole: String = "Customer"
+    private var userRole = "Customer"
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_account, container, false)
 
-        // Firebase setup
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        // UI elements
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
 
-        // Get role from ViewPager arguments
         userRole = arguments?.getString("userRole") ?: "Customer"
-        roleTextView.text = userRole.uppercase()
 
+        loadUserName()
         loadProfileImage()
 
         profileButton.setOnClickListener {
-            val intent = Intent(requireContext(), ProfileActivity::class.java)
-            intent.putExtra("userRole", userRole)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), ProfileActivity::class.java).putExtra("userRole", userRole))
         }
 
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadUserName()
+        loadProfileImage()
+    }
+
+    private fun loadUserName() {
+        val uid = auth.currentUser?.uid ?: return
+        database.reference.child("users").child(userRole).child(uid)
+            .get().addOnSuccessListener {
+                val name = it.child("name").getValue(String::class.java)
+                roleTextView.text = "Welcome, ${name ?: "User"}!"
+            }
+    }
+
     private fun loadProfileImage() {
-        val currentUser = auth.currentUser ?: return
-
-        val userRef = database.reference
-            .child("users")
-            .child(userRole)
-            .child(currentUser.uid)
-
-        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val imageUrl = snapshot.child("profileImage").getValue(String::class.java)
-
+        val uid = auth.currentUser?.uid ?: return
+        database.reference.child("users").child(userRole).child(uid)
+            .get().addOnSuccessListener {
                 Glide.with(requireContext())
-                    .load(imageUrl)
+                    .load(it.child("profileImage").value)
                     .placeholder(R.drawable.ic_profile_placeholder)
-                    .error(R.drawable.ic_profile_placeholder)
                     .circleCrop()
                     .into(profileButton)
             }
+    }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load profile image", Toast.LENGTH_SHORT).show()
-            }
-        })
+    companion object {
+        fun newInstance(role: String): AccountFragment {
+            val fragment = AccountFragment()
+            fragment.arguments = Bundle().apply { putString("userRole", role) }
+            return fragment
+        }
     }
 }
