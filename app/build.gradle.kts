@@ -5,11 +5,6 @@ plugins {
     id("com.google.gms.google-services")
     kotlin("kapt")
 }
-//
-//repositories {
-//    google()
-//    mavenCentral() // ✅ required for AWS SDK
-//}
 
 
 android {
@@ -48,11 +43,24 @@ android {
 }
 
 dependencies {
-    // AndroidX and UI
+
     implementation(libs.androidx.core.ktx.v1120)
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.7.0") // <- add this
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1") // if using ConstraintLayout
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0")) // ✅ Add this line
+
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+
+    implementation ("com.amazonaws:aws-android-sdk-s3:2.73.0")
+
+
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -63,30 +71,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-database")
-
-    // Glide for loading images
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    kapt("com.github.bumptech.glide:compiler:4.16.0")
-
-//    // AWS S3 SDK
-//    implementation("com.amazonaws:aws-android-sdk-core:2.54.0")
-//    implementation("com.amazonaws:aws-android-sdk-s3:2.54.0")
-//    implementation("com.amazonaws:aws-android-sdk-cognito:2.54.0")
-
-    // AWS S3 + Cognito
-    implementation("com.amazonaws:aws-android-sdk-core:2.54.0")
-    implementation("com.amazonaws:aws-android-sdk-s3:2.54.0")
-
-    implementation("com.amazonaws:aws-android-sdk-core:2.54.0")
-    implementation("com.amazonaws:aws-android-sdk-s3:2.54.0")
-    implementation("com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.54.0")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
 
-    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

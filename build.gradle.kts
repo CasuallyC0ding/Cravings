@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
 }
 buildscript {
-    repositories {
+        repositories {
         google()
         mavenCentral()
     }
