@@ -12,10 +12,10 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
     // Return the correct fragment for each position
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> HomeFragment()      // 🏠 Home tab
+            0 -> ShopsFragment()      // 🏠 Home tab
             1 -> OrdersFragment()    // 📦 Orders tab
             2 -> AccountFragment()   // 👤 Account tab
-            else -> HomeFragment()
+            else -> ShopsFragment()
         }
     }
 }
