@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
         <activity
+            android:name=".baseActivities.CartActivity"
+            android:exported="false" />
+        <activity
             android:name=".baseActivities.ShopProductsActivity"
             android:exported="false" />
         <activity

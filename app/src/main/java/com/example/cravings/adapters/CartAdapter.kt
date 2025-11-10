@@ -11,12 +11,12 @@ import com.bumptech.glide.Glide
 import com.example.cravings.R
 import com.example.cravings.models.Product
 
-class ProductAdapter(
-    private val productList: List<Product>,
-    private val updateCart: (Product) -> Unit  // Pass function from Activity
-) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+class CartAdapter(
+    private val cartItems: List<Product>,
+    private val onQuantityChanged: () -> Unit
+) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
 
-    class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class CartViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val productImage: ImageView = itemView.findViewById(R.id.productImage)
         val productName: TextView = itemView.findViewById(R.id.productName)
         val productPrice: TextView = itemView.findViewById(R.id.productPrice)
@@ -26,30 +26,30 @@ class ProductAdapter(
         val tvQuantity: TextView = itemView.findViewById(R.id.tvQuantity)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_product_card, parent, false)
-        return ProductViewHolder(view)
+        return CartViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        val product = productList[position]
+    override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
+        val product = cartItems[position]
 
         holder.productName.text = product.name
         holder.productPrice.text = "EGP ${product.price}"
         holder.productDescription.text = product.description
+        holder.tvQuantity.text = product.selectedQuantity.toString()
+
         Glide.with(holder.itemView.context)
             .load(product.imageUrl)
             .placeholder(R.drawable.ic_profile_placeholder)
             .into(holder.productImage)
 
-        holder.tvQuantity.text = product.selectedQuantity.toString()
-
         holder.btnPlus.setOnClickListener {
             if (product.selectedQuantity < (product.stock ?: 0)) {
                 product.selectedQuantity++
                 holder.tvQuantity.text = product.selectedQuantity.toString()
-                updateCart(product)
+                onQuantityChanged()
             }
         }
 
@@ -57,10 +57,10 @@ class ProductAdapter(
             if (product.selectedQuantity > 0) {
                 product.selectedQuantity--
                 holder.tvQuantity.text = product.selectedQuantity.toString()
-                updateCart(product)
+                onQuantityChanged()
             }
         }
     }
 
-    override fun getItemCount(): Int = productList.size
+    override fun getItemCount(): Int = cartItems.size
 }
