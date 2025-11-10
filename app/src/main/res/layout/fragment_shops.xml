@@ -17,21 +17,30 @@
         android:layout_height="match_parent"
         android:background="@drawable/dark_gradient_overlay" />
 
-    <!-- Foreground -->
+    <!-- Foreground content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="24dp">
+        android:padding="16dp">
 
         <TextView
+            android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to Home!"
+            android:text="Nearby Shops"
             android:textColor="#FFD180"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:fontFamily="@font/dancing_script_semibold" />
+            android:fontFamily="@font/dancing_script_semibold"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/shopsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
     </LinearLayout>
+
 </RelativeLayout>
