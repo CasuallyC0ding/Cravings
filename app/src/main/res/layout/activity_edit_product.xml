@@ -1,46 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- RecyclerView for listing all products -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerProducts"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-        <EditText
-            android:id="@+id/editProductName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Product Name" />
-
-        <EditText
-            android:id="@+id/editProductPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="Price" />
-
-        <EditText
-            android:id="@+id/editProductQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="Quantity" />
-
-        <EditText
-            android:id="@+id/editProductDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description" />
-
-        <Button
-            android:id="@+id/btnUpdateProduct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Update Product" />
-
-    </LinearLayout>
-</ScrollView>
+    <!-- Edit form -->
+    <EditText
+        android:id="@+id/editProductName"
+        android:hint="Name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/editProductPrice"
+        android:hint="Price"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/editProductQuantity"
+        android:hint="Stock"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/editProductDescription"
+        android:hint="Description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/btnUpdateProduct"
+        android:text="Update Product"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

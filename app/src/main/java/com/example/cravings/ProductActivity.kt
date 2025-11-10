@@ -2,6 +2,7 @@ package com.example.cravings
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,7 +18,7 @@ class ProductActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var addItemBtn: FloatingActionButton
     private lateinit var adapter: ProductAdapter
-    private val productList = mutableListOf<ProductActivity>()
+    private val productMerchantList = mutableListOf<Product_Merchant>() // ✅ Changed from ProductActivity to Product
 
     private lateinit var dbRef: DatabaseReference
     private val sellerId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -36,7 +37,7 @@ class ProductActivity : AppCompatActivity() {
         addItemBtn = findViewById(R.id.btnAddItem)
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        adapter = ProductAdapter(productList) { product ->
+        adapter = ProductAdapter(productMerchantList) { product ->
             val intent = Intent(this, EditProductActivity::class.java)
             intent.putExtra("productId", product.productId)
             startActivity(intent)
@@ -54,21 +55,22 @@ class ProductActivity : AppCompatActivity() {
             .child("products")
 
         loadProducts()
-
     }
 
     private fun loadProducts() {
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                productList.clear()
+                productMerchantList.clear()
                 for (child in snapshot.children) {
-                    val product = child.getValue(ProductActivity::class.java)
-                    if (product != null) productList.add(product)
+                    val productMerchant = child.getValue(Product_Merchant::class.java) // ✅ Correct class
+                    if (productMerchant != null) productMerchantList.add(productMerchant)
                 }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@ProductActivity, "Failed to load products", Toast.LENGTH_SHORT).show()
+            }
         })
     }
 }

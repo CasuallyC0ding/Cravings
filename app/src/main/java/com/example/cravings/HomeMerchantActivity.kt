@@ -39,6 +39,7 @@ class HomeMerchantActivity : AppCompatActivity() {
         roleTextView = findViewById(R.id.roleText)
         profileButton = findViewById(R.id.profileButton)
         profileImage = findViewById(R.id.profileImage)
+        manageProductsButton = findViewById(R.id.manageProductsBtn)
 
         // Set top label
         roleTextView.text = userRole.uppercase()

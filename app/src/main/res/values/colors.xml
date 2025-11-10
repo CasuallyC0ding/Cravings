@@ -7,4 +7,24 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#808080</color>
+    <!-- Food-themed orange palette -->
+    <color name="orange_primary">#FF8C42</color>
+    <color name="orange_warm">#FF6B35</color>
+    <color name="orange_bright">#FFA737</color>
+    <color name="orange_soft">#FFB347</color>
+    <color name="orange_muted">#E67E22</color>
+
+    <!-- Background and surface colors -->
+    <color name="orange_light">#FFF5EB</color>
+    <color name="orange_lighter">#FFFAF5</color>
+
+    <!-- Text and accent colors -->
+    <color name="orange_text">#CC5500</color>
+    <color name="orange_border">#FFD8B2</color>
+
+    <!-- State colors -->
+    <color name="orange_pressed">#E67E22</color>
+    <color name="orange_disabled">#FFD8B2</color>
+
 </resources>

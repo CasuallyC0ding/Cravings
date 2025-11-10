@@ -11,6 +11,21 @@
                   <entry key="vectorAssetStep">
                     <value>
                       <PersistentState>
+                        <option name="children">
+                          <map>
+                            <entry key="clipartAsset">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../Android_SDK/icons/material/materialicons/app_registration/baseline_app_registration_24.xml" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                         <option name="values">
                           <map>
                             <entry key="outputName" value="ic_edit" />

@@ -18,10 +18,10 @@
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
         <activity
-            android:name=".EditProducts"
+            android:name=".EditProductActivity"
             android:exported="false" />
         <activity
-            android:name=".AddProduct"
+            android:name=".AddProductActivity"
             android:exported="false" />
         <activity
             android:name=".ProductActivity"
