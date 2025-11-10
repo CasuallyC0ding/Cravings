@@ -6,15 +6,17 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class HomeMerchantActivity : AppCompatActivity() {
 
     private lateinit var profileButton: ImageView
-    private lateinit var profileImage: ImageView
     private lateinit var roleTextView: TextView
     private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
@@ -34,13 +36,12 @@ class HomeMerchantActivity : AppCompatActivity() {
         // Initialize UI
         roleTextView = findViewById(R.id.roleText)
         profileButton = findViewById(R.id.profileButton)
-        profileImage = findViewById(R.id.profileImage)
 
         // Set top label
         roleTextView.text = userRole.uppercase()
 
-        // Load image initially
-        loadProfileImage()
+        // Setup ViewPager and TabLayout
+        setupViewPager()
 
         // Open ProfileActivity on click
         profileButton.setOnClickListener {
@@ -50,60 +51,25 @@ class HomeMerchantActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupViewPager() {
+        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
+
+        val adapter = MerchantPagerAdapter(this)
+        viewPager.adapter = adapter
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Products"
+                1 -> "Orders"
+                else -> "Products"
+            }
+        }.attach()
+    }
+
     // 🔁 Refresh profile image each time user returns
     override fun onResume() {
         super.onResume()
-        loadProfileImage()
-    }
-
-    // 📸 Function to load the image from Firebase
-    private fun loadProfileImage() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        val userId = currentUser.uid
-        val userRef = database.reference.child("users").child(userRole).child(userId)
-
-        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val imageUrl = snapshot.child("profileImage").getValue(String::class.java)
-
-                if (!imageUrl.isNullOrEmpty()) {
-                    // Disable all caching (memory + disk)
-                    Glide.with(this@HomeMerchantActivity)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_profile_placeholder)
-                        .error(R.drawable.ic_profile_placeholder)
-                        .circleCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
-                        .into(profileButton)
-
-                    Glide.with(this@HomeMerchantActivity)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_profile_placeholder)
-                        .error(R.drawable.ic_profile_placeholder)
-                        .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
-                        .into(profileImage)
-                } else {
-                    profileButton.setImageResource(R.drawable.ic_profile_placeholder)
-                    profileImage.setImageResource(R.drawable.ic_profile_placeholder)
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    this@HomeMerchantActivity,
-                    "Failed to load profile image",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
+        // The profile image loading will be handled in the ProductsFragment now
     }
 }
