@@ -1,9 +1,12 @@
-package com.example.cravings
+package com.example.cravings.adapters
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.cravings.customerFragments.ShopsFragment
+import com.example.cravings.customerFragments.OrdersFragment
+import com.example.cravings.customerFragments.AccountFragment
 
 class ViewPagerAdapter(
     activity: FragmentActivity,
@@ -20,6 +23,7 @@ class ViewPagerAdapter(
             else -> ShopsFragment()
         }
 
+        // ✅ Pass userRole to fragment
         fragment.arguments = Bundle().apply {
             putString("userRole", userRole)
         }

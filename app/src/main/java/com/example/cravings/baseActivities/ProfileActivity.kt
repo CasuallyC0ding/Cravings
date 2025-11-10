@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import android.net.Uri
+import android.view.View
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
@@ -18,6 +19,10 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.cravings.R
+import java.io.File
+import java.io.FileOutputStream
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -65,11 +70,11 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         if (userRole == "Merchant") {
-            shopNameInput.visibility = android.view.View.VISIBLE
-            shopNameLabel.visibility = android.view.View.VISIBLE
+            shopNameInput.visibility = View.VISIBLE
+            shopNameLabel.visibility = View.VISIBLE
         } else {
-            shopNameInput.visibility = android.view.View.GONE
-            shopNameLabel.visibility = android.view.View.GONE
+            shopNameInput.visibility = View.GONE
+            shopNameLabel.visibility = View.GONE
         }
 
         // ✅ Load all user data including image
@@ -97,7 +102,7 @@ class ProfileActivity : AppCompatActivity() {
                             Glide.with(this@ProfileActivity)
                                 .load(imageUrl)
                                 .placeholder(R.drawable.ic_profile_placeholder) // optional placeholder
-                                .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE) // Disable disk caching
+                                .diskCacheStrategy(DiskCacheStrategy.NONE) // Disable disk caching
                                 .skipMemoryCache(true) // Disable memory caching
                                 .into(profileImageView)
                         }
@@ -207,10 +212,10 @@ class ProfileActivity : AppCompatActivity() {
         })
     }
 
-    private fun getFileFromUri(uri: Uri): java.io.File? {
+    private fun getFileFromUri(uri: Uri): File? {
         val inputStream = contentResolver.openInputStream(uri) ?: return null
-        val file = java.io.File(cacheDir, "temp_${System.currentTimeMillis()}.jpg")
-        val outputStream = java.io.FileOutputStream(file)
+        val file = File(cacheDir, "temp_${System.currentTimeMillis()}.jpg")
+        val outputStream = FileOutputStream(file)
         inputStream.copyTo(outputStream)
         outputStream.close()
         inputStream.close()

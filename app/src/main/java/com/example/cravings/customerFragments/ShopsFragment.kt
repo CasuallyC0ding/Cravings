@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.customerFragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.R
 import com.example.cravings.adapters.ShopAdapter
 import com.example.cravings.models.Shop
 import com.google.firebase.auth.FirebaseAuth
@@ -36,24 +38,21 @@ class ShopsFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_shops, container, false)
 
-        // Firebase
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        // UI
+        // Top bar UI
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
 
-        // Get role from parent activity
-        userRole = (activity as? HomeCustomerActivity)?.intent?.getStringExtra("userRole") ?: "Customer"
+        // Get role passed from HomeActivity
+        userRole = arguments?.getString("userRole") ?: "Customer"
         roleTextView.text = userRole.uppercase()
 
         loadProfileImage()
 
         profileButton.setOnClickListener {
-            val intent = Intent(requireContext(), ProfileActivity::class.java)
-            intent.putExtra("userRole", userRole)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), ProfileActivity::class.java).putExtra("userRole", userRole))
         }
 
         // Shops list
@@ -91,9 +90,11 @@ class ShopsFragment : Fragment() {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     shopList.clear()
-                    for (shopSnapshot in snapshot.children) {
-                        val shop = shopSnapshot.getValue(Shop::class.java)
-                        if (shop != null) shopList.add(shop.copy(uid = shopSnapshot.key ?: ""))
+                    for (shopSnap in snapshot.children) {
+                        val shop = shopSnap.getValue(Shop::class.java)
+                        if (shop != null) {
+                            shopList.add(shop.copy(uid = shopSnap.key ?: ""))
+                        }
                     }
                     adapter.notifyDataSetChanged()
                 }

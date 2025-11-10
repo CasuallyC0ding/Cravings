@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.customerFragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
-class AccountFragment : Fragment() {
+class OrdersFragment : Fragment() {
 
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
@@ -21,16 +22,22 @@ class AccountFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private var userRole: String = "Customer"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
-        val view = inflater.inflate(R.layout.fragment_account, container, false)
+        val view = inflater.inflate(R.layout.fragment_orders, container, false)
 
+        // Firebase
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
+        // UI
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
 
+        // ✅ Get role safely from arguments
         userRole = arguments?.getString("userRole") ?: "Customer"
         roleTextView.text = userRole.uppercase()
 
@@ -60,9 +67,17 @@ class AccountFragment : Fragment() {
                     .into(profileButton)
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load profile image", Toast.LENGTH_SHORT).show()
-            }
+            override fun onCancelled(error: DatabaseError) { }
         })
+    }
+
+    companion object {
+        fun newInstance(role: String): OrdersFragment {
+            val fragment = OrdersFragment()
+            val args = Bundle()
+            args.putString("userRole", role)
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

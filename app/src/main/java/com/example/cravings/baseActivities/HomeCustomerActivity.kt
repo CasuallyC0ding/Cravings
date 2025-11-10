@@ -1,8 +1,10 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.example.cravings.R
+import com.example.cravings.adapters.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
@@ -10,8 +12,8 @@ import com.google.firebase.database.FirebaseDatabase
 
 class HomeCustomerActivity : AppCompatActivity() {
 
-    private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
     private var userRole: String = "Customer"
 
     private lateinit var tabLayout: TabLayout
