@@ -1,8 +1,11 @@
-package com.example.cravings
+package com.example.cravings.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.cravings.customerFragments.AccountFragment
+import com.example.cravings.customerFragments.OrdersFragment
+import com.example.cravings.customerFragments.ShopsFragment
 
 class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 

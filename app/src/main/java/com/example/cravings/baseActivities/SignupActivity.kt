@@ -1,10 +1,11 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 

@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.content.Intent
 import android.os.Bundle

@@ -1,10 +1,11 @@
-package com.example.cravings
+package com.example.cravings.customerFragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.cravings.R
 
 class OrdersFragment : Fragment() {
     override fun onCreateView(
