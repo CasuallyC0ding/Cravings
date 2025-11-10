@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg"
+        android:src="@drawable/food_pattern_bg_dark"
         android:contentDescription="Background" />
 
     <!-- Dark gradient overlay -->
