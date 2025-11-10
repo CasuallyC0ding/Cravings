@@ -1,9 +1,10 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.activity.ComponentActivity
+import com.example.cravings.R
 
 class RoleSelectionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

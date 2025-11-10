@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.baseActivities
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -18,6 +18,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.bumptech.glide.Glide
+import com.example.cravings.R
 
 class ProfileActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.example.cravings
+package com.example.cravings.customerFragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cravings.R
 import com.example.cravings.adapters.ShopAdapter
 import com.example.cravings.models.Shop
 import com.google.firebase.database.DataSnapshot

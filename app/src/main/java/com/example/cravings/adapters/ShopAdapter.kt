@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.cravings.R
+import com.example.cravings.baseActivities.ShopProductsActivity
 import com.example.cravings.models.Shop
 
 class ShopAdapter(private val shopList: List<Shop>) :
@@ -45,10 +46,12 @@ class ShopAdapter(private val shopList: List<Shop>) :
 
 
         holder.itemView.setOnClickListener {
-          //  val context = holder. itemView. context
-           // val intent = Intent( packageContext = context,cls = ShopMenuActivity:: class. java)
-            //    context.startActivity(intent)
-
+            holder.itemView.setOnClickListener {
+                val context = holder.itemView.context
+                val intent = Intent(context, ShopProductsActivity::class.java)
+                intent.putExtra("shopId", shop.uid) // Make sure your Shop model has an 'id' field
+                context.startActivity(intent)
+            }
 
 
         }
