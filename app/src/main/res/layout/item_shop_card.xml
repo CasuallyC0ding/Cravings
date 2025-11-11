@@ -14,7 +14,6 @@
         android:orientation="horizontal"
         android:background="#FBEFD9">
 
-        <!-- LEFT IMAGE -->
         <ImageView
             android:id="@+id/shopImage"
             android:layout_width="0dp"
@@ -23,7 +22,6 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true" />
 
-        <!-- RIGHT TEXT AREA -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"

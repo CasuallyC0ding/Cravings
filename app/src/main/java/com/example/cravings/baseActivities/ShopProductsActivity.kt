@@ -9,10 +9,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cravings.R
 import com.example.cravings.adapters.ProductAdapter
 import com.example.cravings.models.Product
 import com.google.firebase.database.*
-import com.example.cravings.R
 
 class ShopProductsActivity : AppCompatActivity() {
 
@@ -27,23 +27,20 @@ class ShopProductsActivity : AppCompatActivity() {
 
     private val cartMap = mutableMapOf<Int, Product>() // productId -> Product
 
-    // Activity result launcher for CartActivity
+    private lateinit var shopNameText: TextView
+
     private val cartLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val updatedCart = result.data?.getParcelableArrayListExtra<Product>("updatedCart")
             if (updatedCart != null) {
-                // Update productList quantities
                 for (product in productList) {
                     val updated = updatedCart.find { it.productId == product.productId }
                     product.selectedQuantity = updated?.selectedQuantity ?: 0
                 }
-
-                // Update cartMap
                 cartMap.clear()
                 updatedCart.forEach { if (it.selectedQuantity > 0) cartMap[it.productId!!] = it }
-
                 adapter.notifyDataSetChanged()
                 updateCartUI()
             }
@@ -55,19 +52,24 @@ class ShopProductsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_shop_products)
 
         recyclerView = findViewById(R.id.recyclerViewProducts)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
         cartLayout = findViewById(R.id.cartLayout)
         cartItemCount = findViewById(R.id.cartItemCount)
         cartTotalPrice = findViewById(R.id.cartTotalPrice)
+        shopNameText = findViewById(R.id.shopNameText)
 
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        // Adapter with lambda to update cart
+        // ✅ Change here: Use LinearLayoutManager for one card per row
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
         adapter = ProductAdapter(productList) { product ->
             updateCart(product)
         }
         recyclerView.adapter = adapter
+
+        val shopId = intent.getStringExtra("shopId") ?: return
+        val shopName = intent.getStringExtra("shopName") ?: "Shop"
+        shopNameText.text = shopName
 
         cartLayout.setOnClickListener {
             val intent = Intent(this, CartActivity::class.java)
@@ -75,8 +77,7 @@ class ShopProductsActivity : AppCompatActivity() {
             cartLauncher.launch(intent)
         }
 
-        val shopId = intent.getStringExtra("shopId")
-        if (shopId != null) loadProducts(shopId)
+        loadProducts(shopId)
     }
 
     private fun loadProducts(shopId: String) {
