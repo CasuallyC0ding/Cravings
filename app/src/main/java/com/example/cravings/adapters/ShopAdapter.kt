@@ -38,18 +38,19 @@ class ShopAdapter(private val shopList: List<Shop>) :
                 .load(shop.profileImage)
                 .placeholder(R.drawable.ic_profile_placeholder)
                 .error(R.drawable.ic_profile_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.NONE) // prevent old cached photo
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(holder.shopImage)
         } else {
             holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
-        // Open shop products page
+        // ✅ Send shop name and ID when opened
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, ShopProductsActivity::class.java)
             intent.putExtra("shopId", shop.uid)
+            intent.putExtra("shopName", shop.shopName) // ✅ Added
             context.startActivity(intent)
         }
     }

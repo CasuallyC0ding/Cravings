@@ -13,7 +13,7 @@ import com.example.cravings.models.Product
 
 class ProductAdapter(
     private val productList: List<Product>,
-    private val updateCart: (Product) -> Unit  // Pass function from Activity
+    private val updateCart: (Product) -> Unit
 ) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -38,6 +38,7 @@ class ProductAdapter(
         holder.productName.text = product.name
         holder.productPrice.text = "EGP ${product.price}"
         holder.productDescription.text = product.description
+
         Glide.with(holder.itemView.context)
             .load(product.imageUrl)
             .placeholder(R.drawable.ic_profile_placeholder)
