@@ -23,6 +23,7 @@ class RoleSelectionActivity : ComponentActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             intent.putExtra("userRole", "Customer")
             startActivity(intent)
+            finish()
         }
     }
 }

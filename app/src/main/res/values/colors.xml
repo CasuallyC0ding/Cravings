@@ -27,4 +27,5 @@
     <color name="orange_pressed">#E67E22</color>
     <color name="orange_disabled">#FFD8B2</color>
 
+    <color name="tab_text_color">#FFFFFF</color>
 </resources>
