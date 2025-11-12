@@ -1,33 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <!-- Background -->
-    <ImageView
-        android:id="@+id/bgImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg_light" />
-
-    <!-- ViewPager fills whole screen now -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/tabLayout"/>
 
-    <!-- Bottom Tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/btn_orange_gradient"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
         app:tabIconTint="@color/nav_item_color"
-        app:tabTextColor="@color/nav_item_color"
-        app:tabIndicatorColor="#FFFFFF" />
-
+        app:tabTextColor="#757575"
+        app:tabSelectedTextColor="#28A745"
+        app:tabIndicatorColor="#28A745"
+        app:tabIndicatorHeight="3dp" />
 </RelativeLayout>

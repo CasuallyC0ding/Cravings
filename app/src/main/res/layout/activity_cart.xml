@@ -1,27 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <!-- Background -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/food_pattern_bg_light"
-        android:scaleType="centerCrop" />
-
-    <!-- Dark overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
-
-    <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
+
+        <!-- Top Bar -->
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="4dp">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#28A745"
+                android:contentDescription="Back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Order Summary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginStart="12dp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
 
         <!-- Cart List -->
         <androidx.recyclerview.widget.RecyclerView
@@ -29,40 +46,63 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:padding="8dp"
             android:scrollbars="vertical" />
 
-        <!-- Bottom Cart Total + Proceed Button -->
+        <!-- Bottom Total + Checkout Button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="12dp"
-            android:background="#FF8C42"
-            android:layout_marginTop="8dp">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="8dp">
 
-            <TextView
-                android:id="@+id/totalPriceText"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Total: EGP 0.00"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp">
 
-            <!-- ✅ Button (not TextView) — prevents crash -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Total"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333" />
+
+                <TextView
+                    android:id="@+id/totalPriceText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EGP 0.00"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#28A745" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/proceedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PROCEED TO CHECKOUT"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Proceed to Checkout"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                android:background="@android:color/transparent"
-                android:paddingHorizontal="8dp" />
+                android:textSize="16sp"
+                android:backgroundTint="#28A745"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/editButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Edit Order"
+                android:textColor="#28A745"
+                android:background="@drawable/rounded_input"
+                android:layout_marginTop="8dp"/>
         </LinearLayout>
-
     </LinearLayout>
-
 </RelativeLayout>

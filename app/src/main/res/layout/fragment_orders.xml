@@ -1,71 +1,116 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <!-- Background -->
-    <ImageView
+    <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg_light"
-        android:contentDescription="Background" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-    <!-- Dark gradient overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Foreground content -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🍴"
+                android:textSize="24sp"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cravings"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FF8C00"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/profileButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_profile_placeholder"
+            android:background="@drawable/circle_background"
+            android:clipToOutline="true"
+            android:contentDescription="Profile" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- ✅ Top Bar -->
-        <LinearLayout
-            android:id="@+id/topBar"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/roleText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp">
+            android:text="Welcome back!"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif" />
 
-            <TextView
-                android:id="@+id/roleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CUSTOMER"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFD180"
-                android:layout_weight="1"
-                android:fontFamily="@font/dancing_script_semibold" />
-
-            <ImageView
-                android:id="@+id/profileButton"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_profile_placeholder"
-                android:background="@drawable/circle_background"
-                android:clipToOutline="true" />
-        </LinearLayout>
-
-        <!-- Orders content -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to Orders!"
-            android:textColor="#FFD180"
+            android:text="Order History"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:fontFamily="@font/dancing_script_semibold"
-            android:layout_marginTop="24dp" />
+            android:textColor="#333333"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="16dp" />
 
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋"
+                android:textSize="64sp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No orders yet"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start ordering from your favorite restaurants!"
+                android:textSize="14sp"
+                android:textColor="#999999"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ordersRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
     </LinearLayout>
-
 </RelativeLayout>

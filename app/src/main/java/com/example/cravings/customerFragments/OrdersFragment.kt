@@ -15,14 +15,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class OrdersFragment : Fragment() {
-
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_orders, container, false)
 
         auth = FirebaseAuth.getInstance()
@@ -37,7 +40,8 @@ class OrdersFragment : Fragment() {
         loadProfileImage()
 
         profileButton.setOnClickListener {
-            startActivity(Intent(requireContext(), ProfileActivity::class.java).putExtra("userRole", userRole))
+            startActivity(Intent(requireContext(), ProfileActivity::class.java)
+                .putExtra("userRole", userRole))
         }
 
         return view

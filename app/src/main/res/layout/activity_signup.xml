@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background image -->
     <ImageView
         android:id="@+id/bgImage"
         android:layout_width="match_parent"
@@ -11,13 +10,11 @@
         android:src="@drawable/food_bg"
         android:contentDescription="Background" />
 
-    <!-- Dark gradient overlay -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/dark_gradient_overlay" />
 
-    <!-- Foreground layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,7 +22,6 @@
         android:gravity="center"
         android:padding="24dp">
 
-        <!-- Title -->
         <TextView
             android:id="@+id/appTitle"
             android:text="Cravings"
@@ -41,7 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <!-- Center Card -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -54,7 +49,6 @@
             android:layout_gravity="center"
             android:background="@drawable/rounded_card">
 
-            <!-- Name -->
             <EditText
                 android:id="@+id/nameInput"
                 android:hint="Full Name"
@@ -67,7 +61,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- Phone -->
             <EditText
                 android:id="@+id/phoneInput"
                 android:hint="Phone Number"
@@ -80,7 +73,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- Email -->
             <EditText
                 android:id="@+id/emailInput"
                 android:hint="Email"
@@ -93,7 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- Password -->
             <EditText
                 android:id="@+id/passwordInput"
                 android:hint="Password"
@@ -106,7 +97,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- Sign Up Button -->
             <Button
                 android:id="@+id/signupBtn"
                 android:text="Create Account"
@@ -119,7 +109,6 @@
                 android:padding="14dp" />
         </LinearLayout>
 
-        <!-- Login Redirect -->
         <TextView
             android:id="@+id/loginRedirect"
             android:text="Already have an account? Log in"

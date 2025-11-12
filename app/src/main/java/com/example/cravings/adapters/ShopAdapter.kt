@@ -29,10 +29,9 @@ class ShopAdapter(private val shopList: List<Shop>) :
 
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
-
         holder.shopName.text = shop.shopName
 
-        // ✅ Load image without making it circular
+        // Load shop image
         if (!shop.profileImage.isNullOrEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(shop.profileImage)
@@ -45,12 +44,12 @@ class ShopAdapter(private val shopList: List<Shop>) :
             holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
-        // ✅ Send shop name and ID when opened
+        // Send shop name and ID when opened
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, ShopProductsActivity::class.java)
             intent.putExtra("shopId", shop.uid)
-            intent.putExtra("shopName", shop.shopName) // ✅ Added
+            intent.putExtra("shopName", shop.shopName)
             context.startActivity(intent)
         }
     }

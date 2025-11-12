@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.cravings.R
@@ -19,18 +19,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ShopsFragment : Fragment() {
-
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ShopAdapter
     private lateinit var shopList: ArrayList<Shop>
-
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_shops, container, false)
 
         auth = FirebaseAuth.getInstance()
@@ -45,11 +47,15 @@ class ShopsFragment : Fragment() {
         loadProfileImage()
 
         profileButton.setOnClickListener {
-            startActivity(Intent(requireContext(), ProfileActivity::class.java).putExtra("userRole", userRole))
+            startActivity(Intent(requireContext(), ProfileActivity::class.java)
+                .putExtra("userRole", userRole))
         }
 
         recyclerView = view.findViewById(R.id.shopsRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Use GridLayoutManager for 2 columns
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+
         shopList = arrayListOf()
         adapter = ShopAdapter(shopList)
         recyclerView.adapter = adapter
@@ -73,6 +79,7 @@ class ShopsFragment : Fragment() {
                     val name = snapshot.child("name").getValue(String::class.java)
                     roleTextView.text = "Welcome, ${name ?: "User"}!"
                 }
+
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
@@ -88,6 +95,7 @@ class ShopsFragment : Fragment() {
                         .circleCrop()
                         .into(profileButton)
                 }
+
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
@@ -104,6 +112,7 @@ class ShopsFragment : Fragment() {
                     }
                     adapter.notifyDataSetChanged()
                 }
+
                 override fun onCancelled(error: DatabaseError) {}
             })
     }

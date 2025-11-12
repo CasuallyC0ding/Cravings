@@ -8,12 +8,12 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
 import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
 
@@ -26,14 +26,15 @@ class LoginActivity : AppCompatActivity() {
 
         val userRole = intent.getStringExtra("userRole") ?: return
 
-        // ⬅️ NEW: Get top-left role text view
+        // Get top-left role text view
         val loginRoleText = findViewById<TextView>(R.id.loginRoleText)
-        loginRoleText.text = userRole.uppercase() // ⬅️ Show role nicely
+        loginRoleText.text = userRole.uppercase()
 
         val emailInput = findViewById<EditText>(R.id.emailInput)
         val passwordInput = findViewById<EditText>(R.id.passwordInput)
         val loginBtn = findViewById<Button>(R.id.loginBtn)
         val registerLink = findViewById<TextView>(R.id.registerRedirect)
+
         registerLink.paintFlags = registerLink.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         loginBtn.setOnClickListener {
@@ -53,13 +54,11 @@ class LoginActivity : AppCompatActivity() {
                         .addOnSuccessListener { snapshot ->
                             if (snapshot.exists()) {
                                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
-
                                 val intent = when (userRole.lowercase()) {
                                     "merchant" -> Intent(this, HomeMerchantActivity::class.java)
                                     "customer" -> Intent(this, HomeCustomerActivity::class.java)
                                     else -> Intent(this, ProfileActivity::class.java)
                                 }
-
                                 intent.putExtra("userRole", userRole)
                                 startActivity(intent)
                                 finish()

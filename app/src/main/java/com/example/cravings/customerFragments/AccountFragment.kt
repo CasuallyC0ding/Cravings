@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -15,14 +16,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class AccountFragment : Fragment() {
-
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
+    private lateinit var btnEditProfile: Button
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_account, container, false)
 
         auth = FirebaseAuth.getInstance()
@@ -30,6 +35,7 @@ class AccountFragment : Fragment() {
 
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
+        btnEditProfile = view.findViewById(R.id.btnEditProfile)
 
         userRole = arguments?.getString("userRole") ?: "Customer"
 
@@ -37,7 +43,13 @@ class AccountFragment : Fragment() {
         loadProfileImage()
 
         profileButton.setOnClickListener {
-            startActivity(Intent(requireContext(), ProfileActivity::class.java).putExtra("userRole", userRole))
+            startActivity(Intent(requireContext(), ProfileActivity::class.java)
+                .putExtra("userRole", userRole))
+        }
+
+        btnEditProfile.setOnClickListener {
+            startActivity(Intent(requireContext(), ProfileActivity::class.java)
+                .putExtra("userRole", userRole))
         }
 
         return view
@@ -67,6 +79,14 @@ class AccountFragment : Fragment() {
                     .placeholder(R.drawable.ic_profile_placeholder)
                     .circleCrop()
                     .into(profileButton)
+
+                view?.findViewById<ImageView>(R.id.profileImageLarge)?.let { imgView ->
+                    Glide.with(requireContext())
+                        .load(it.child("profileImage").value)
+                        .placeholder(R.drawable.ic_profile_placeholder)
+                        .circleCrop()
+                        .into(imgView)
+                }
             }
     }
 
