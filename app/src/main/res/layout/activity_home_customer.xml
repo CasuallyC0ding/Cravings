@@ -1,110 +1,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeCustomerActivity">
+    android:background="#FFFFFF">
 
-    <!-- Background image -->
-    <ImageView
-        android:id="@+id/bgImage"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg"
-        android:contentDescription="Background" />
+        android:layout_above="@id/tabLayout"/>
 
-    <!-- Dark gradient overlay -->
-    <View
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
-
-    <!-- Foreground layout -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp">
-
-        <!-- Top Bar -->
-        <LinearLayout
-            android:id="@+id/topBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:id="@+id/roleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CUSTOMER"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFD180"
-                android:layout_weight="1"
-                android:fontFamily="@font/dancing_script_semibold" />
-
-            <ImageView
-                android:id="@+id/profileButton"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="end"
-                android:src="@drawable/ic_profile_placeholder"
-                android:background="@drawable/circle_background"
-                android:clipToOutline="true"
-                android:contentDescription="Profile" />
-        </LinearLayout>
-
-        <!-- Welcome Text -->
-        <TextView
-            android:id="@+id/welcomeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to Customer Home!"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:fontFamily="@font/dancing_script_semibold"
-            android:gravity="center"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Info Card -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:elevation="8dp"
-            android:gravity="center_horizontal"
-            android:layout_margin="16dp"
-            android:clipToOutline="true"
-            android:background="@drawable/rounded_card">
-
-            <TextView
-                android:text="Enjoy browsing delicious meals from your favorite restaurants!"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginBottom="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/viewRestaurantsBtn"
-                android:text="View Restaurants"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_orange_gradient"
-                android:elevation="6dp"
-                android:padding="14dp"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:tabIconTint="@color/nav_item_color"
+        app:tabTextColor="#757575"
+        app:tabSelectedTextColor="#FF8C00"
+        app:tabIndicatorColor="#FF8C00"
+        app:tabIndicatorHeight="3dp" />
 </RelativeLayout>
