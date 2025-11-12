@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Top Bar -->
+        <!-- 🟩 Top Bar -->
         <LinearLayout
             android:id="@+id/topBar"
             android:layout_width="match_parent"
@@ -40,7 +40,21 @@
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>
 
-        <!-- Cart List -->
+        <!-- 🏪 Shop Name -->
+        <TextView
+            android:id="@+id/shopNameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Shop Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#28A745"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp" />
+
+        <!-- 🛒 Cart List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewCart"
             android:layout_width="match_parent"
@@ -49,7 +63,7 @@
             android:padding="8dp"
             android:scrollbars="vertical" />
 
-        <!-- Bottom Total + Checkout Button -->
+        <!-- 💰 Bottom Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,6 +72,7 @@
             android:background="#FFFFFF"
             android:elevation="8dp">
 
+            <!-- Total -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,9 +96,22 @@
                     android:text="EGP 0.00"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#28A745" />
+                    android:textColor="#000000" />
             </LinearLayout>
 
+            <!-- Clear Cart Button -->
+            <Button
+                android:id="@+id/clearCartButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Clear Cart"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:backgroundTint="@android:color/holo_red_light"
+                android:layout_marginTop="4dp" />
+
+            <!-- Proceed Button -->
             <Button
                 android:id="@+id/proceedButton"
                 android:layout_width="match_parent"
@@ -94,15 +122,6 @@
                 android:textSize="16sp"
                 android:backgroundTint="#28A745"
                 android:layout_marginTop="8dp" />
-
-            <Button
-                android:id="@+id/editButton"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Edit Order"
-                android:textColor="#28A745"
-                android:background="@drawable/rounded_input"
-                android:layout_marginTop="8dp"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

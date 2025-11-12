@@ -19,7 +19,7 @@
         android:elevation="8dp"
         app:tabIconTint="@color/nav_item_color"
         app:tabTextColor="#757575"
-        app:tabSelectedTextColor="#28A745"
-        app:tabIndicatorColor="#28A745"
+        app:tabSelectedTextColor="#FF8C00"
+        app:tabIndicatorColor="#FF8C00"
         app:tabIndicatorHeight="3dp" />
 </RelativeLayout>

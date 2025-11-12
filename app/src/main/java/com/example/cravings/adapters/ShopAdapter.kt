@@ -31,7 +31,7 @@ class ShopAdapter(private val shopList: List<Shop>) :
         val shop = shopList[position]
         holder.shopName.text = shop.shopName
 
-        // Load shop image
+        // ✅ Load shop image (not circular, no cache to ensure freshness)
         if (!shop.profileImage.isNullOrEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(shop.profileImage)
@@ -44,7 +44,7 @@ class ShopAdapter(private val shopList: List<Shop>) :
             holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
-        // Send shop name and ID when opened
+        // ✅ Navigate to shop’s product page
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, ShopProductsActivity::class.java)

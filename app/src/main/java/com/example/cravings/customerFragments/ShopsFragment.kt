@@ -14,16 +14,23 @@ import com.bumptech.glide.Glide
 import com.example.cravings.R
 import com.example.cravings.adapters.ShopAdapter
 import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.baseActivities.CartActivity
 import com.example.cravings.models.Shop
+import com.example.cravings.utils.CartManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ShopsFragment : Fragment() {
+
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ShopAdapter
     private lateinit var shopList: ArrayList<Shop>
+
+    private lateinit var cartIcon: ImageView
+    private lateinit var cartBadge: TextView
+
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
@@ -40,26 +47,36 @@ class ShopsFragment : Fragment() {
 
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
+        cartIcon = view.findViewById(R.id.cartIcon)
+        cartBadge = view.findViewById(R.id.cartBadge)
 
         userRole = arguments?.getString("userRole") ?: "Customer"
 
+        // Load user data
         loadUserName()
         loadProfileImage()
 
+        // Navigate to profile
         profileButton.setOnClickListener {
-            startActivity(Intent(requireContext(), ProfileActivity::class.java)
-                .putExtra("userRole", userRole))
+            startActivity(
+                Intent(requireContext(), ProfileActivity::class.java)
+                    .putExtra("userRole", userRole)
+            )
         }
 
+        // Navigate to cart
+        cartIcon.setOnClickListener {
+            startActivity(Intent(requireContext(), CartActivity::class.java))
+        }
+
+        // RecyclerView with 2-column grid layout
         recyclerView = view.findViewById(R.id.shopsRecyclerView)
-
-        // Use GridLayoutManager for 2 columns
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-
         shopList = arrayListOf()
         adapter = ShopAdapter(shopList)
         recyclerView.adapter = adapter
 
+        // Fetch shops from Firebase
         fetchShops()
 
         return view
@@ -69,6 +86,7 @@ class ShopsFragment : Fragment() {
         super.onResume()
         loadUserName()
         loadProfileImage()
+        updateCartBadge(CartManager.getTotalItems())
     }
 
     private fun loadUserName() {
@@ -115,6 +133,17 @@ class ShopsFragment : Fragment() {
 
                 override fun onCancelled(error: DatabaseError) {}
             })
+    }
+
+    private fun updateCartBadge(count: Int) {
+        if (count > 0) {
+            cartBadge.text = count.toString()
+            cartBadge.visibility = View.VISIBLE
+            cartIcon.visibility=View.VISIBLE
+        } else {
+            cartBadge.visibility = View.GONE
+            cartIcon.visibility=View.GONE
+        }
     }
 
     companion object {
