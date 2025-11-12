@@ -34,13 +34,16 @@ class ProductAdapter(
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = productList[position]
+
         holder.productName.text = product.name
         holder.productPrice.text = "EGP ${product.price}"
         holder.productDescription.text = product.description
 
         Glide.with(holder.itemView.context)
-            .load(product.imageUrl)
+            .load(product.imageUrl ?: "")
             .placeholder(R.drawable.ic_profile_placeholder)
+            .error(R.drawable.ic_profile_placeholder)
+            .fallback(R.drawable.ic_profile_placeholder)
             .into(holder.productImage)
 
         holder.tvQuantity.text = product.selectedQuantity.toString()

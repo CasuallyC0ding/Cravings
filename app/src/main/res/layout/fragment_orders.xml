@@ -31,10 +31,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cravings"
-                android:textSize="20sp"
+                android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#FF8C00"
-                android:fontFamily="sans-serif-medium" />
+                android:fontFamily="@font/dancing_script_bold" />
         </LinearLayout>
 
         <ImageView
