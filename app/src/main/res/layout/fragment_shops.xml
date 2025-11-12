@@ -1,40 +1,149 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <!-- Background -->
-    <ImageView
+    <!-- 🔝 Top Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg"
-        android:contentDescription="Background" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-    <!-- Overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
+        <!-- App Logo and Title -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Foreground content -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🍴"
+                android:textSize="24sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cravings"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#FF8C00"
+                android:fontFamily="@font/dancing_script_bold" />
+        </LinearLayout>
+
+        <!-- 🛒 Cart Icon with Badge (moved slightly left) -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="26dp"
+            android:layout_marginRight="26dp">
+
+            <ImageView
+                android:id="@+id/cartIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_cart"
+                android:contentDescription="Cart"
+                app:tint="#000000" />
+
+            <TextView
+                android:id="@+id/cartBadge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="end|top"
+                android:background="@drawable/badge_background"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="gone"
+                android:translationX="0dp"
+                android:translationY="-2dp" />
+        </FrameLayout>
+
+        <!-- 👤 Profile Button -->
+        <ImageView
+            android:id="@+id/profileButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_profile_placeholder"
+            android:background="@drawable/circle_background"
+            android:clipToOutline="true"
+            android:contentDescription="Profile" />
+    </LinearLayout>
+
+    <!-- 🔍 Search and Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_input"
+            android:padding="4dp"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/searchInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Search restaurants..."
+                android:textColorHint="#999999"
+                android:textColor="#000000"
+                android:background="@android:color/transparent"
+                android:padding="12dp"
+                android:inputType="text" />
+
+            <Button
+                android:id="@+id/searchButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="🔍"
+                android:textSize="18sp"
+                android:textColor="#FF8C00"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
+
+        <!-- Welcome text -->
+        <TextView
+            android:id="@+id/roleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back!"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Section Title -->
         <TextView
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nearby Shops"
-            android:textColor="#FFD180"
-            android:textSize="24sp"
+            android:textColor="#000000"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:fontFamily="@font/dancing_script_semibold"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium" />
 
+        <!-- Shops List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/shopsRecyclerView"
             android:layout_width="match_parent"
@@ -42,5 +151,4 @@
             android:clipToPadding="false"
             android:paddingBottom="16dp" />
     </LinearLayout>
-
 </RelativeLayout>

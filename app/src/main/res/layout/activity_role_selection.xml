@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background image -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -10,13 +9,11 @@
         android:scaleType="centerCrop"
         android:contentDescription="Background" />
 
-    <!-- Dark gradient overlay -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/dark_gradient_overlay" />
 
-    <!-- Foreground layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,7 +21,6 @@
         android:gravity="center"
         android:padding="24dp">
 
-        <!-- Title -->
         <TextView
             android:id="@+id/appTitle"
             android:text="Cravings"
@@ -40,7 +36,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <!-- Merchant Button -->
         <Button
             android:id="@+id/merchantBtn"
             android:text="Merchant"
@@ -53,7 +48,6 @@
             android:elevation="6dp"
             android:padding="18dp" />
 
-        <!-- Customer Button -->
         <Button
             android:id="@+id/customerBtn"
             android:text="Customer"
@@ -65,5 +59,4 @@
             android:elevation="6dp"
             android:padding="18dp" />
     </LinearLayout>
-
 </RelativeLayout>
