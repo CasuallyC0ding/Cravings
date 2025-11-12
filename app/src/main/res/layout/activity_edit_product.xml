@@ -1,158 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:fillViewport="true"
+    android:background="#FFFFFF"
+    tools:context=".baseActivities.EditProductActivity">
 
-    <!-- Top Bar -->
     <LinearLayout
-        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="#FFFFFF"
-        android:elevation="4dp">
-
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_revert"
-            android:tint="#28A745"
-            android:contentDescription="Back" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Edit Product"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginStart="12dp"
-            android:fontFamily="sans-serif-medium" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
 
-        <!-- RecyclerView for listing products -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- ▫️ Top Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Product to Edit"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="12dp"
-            android:fontFamily="sans-serif-medium"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerProducts"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginBottom="16dp"/>
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="#28A745"
+                android:contentDescription="Back" />
 
-        <!-- Edit form -->
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_card"
-                android:padding="20dp">
+                android:layout_marginStart="12dp"
+                android:text="Edit Product"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
 
-                <TextView
-                    android:text="Product Details"
-                    android:textColor="#333333"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp" />
+        <!-- ▫️ Product Image Preview -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
 
-                <EditText
-                    android:id="@+id/editProductName"
-                    android:hint="Product Name"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:background="@drawable/rounded_input"
-                    android:padding="14dp"
-                    android:layout_marginBottom="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:scaleType="centerCrop"
+                android:background="#EEEEEE"
+                android:contentDescription="Product Image"
+                android:adjustViewBounds="true"
+                android:clipToOutline="true"
+                android:elevation="2dp" />
 
-                <EditText
-                    android:id="@+id/editProductPrice"
-                    android:hint="Price"
-                    android:inputType="numberDecimal"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:background="@drawable/rounded_input"
-                    android:padding="14dp"
-                    android:layout_marginBottom="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+            <!-- Optional overlay for aesthetics -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33000000"
+                android:visibility="gone" />
+        </FrameLayout>
 
-                <EditText
-                    android:id="@+id/editProductQuantity"
-                    android:hint="Stock"
-                    android:inputType="number"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:background="@drawable/rounded_input"
-                    android:padding="14dp"
-                    android:layout_marginBottom="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+        <!-- ▫️ Upload Photo -->
+        <Button
+            android:id="@+id/btnUploadPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select / Change Photo"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#28A745"
+            android:elevation="2dp"
+            android:layout_marginBottom="24dp" />
 
-                <EditText
-                    android:id="@+id/editProductDescription"
-                    android:hint="Description"
-                    android:gravity="top|start"
-                    android:minLines="3"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:background="@drawable/rounded_input"
-                    android:padding="14dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+        <!-- ▫️ Input Fields -->
+        <EditText
+            android:id="@+id/editProductName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Product Name"
+            android:background="@drawable/rounded_input"
+            android:padding="14dp"
+            android:textColor="#333333"
+            android:textColorHint="#AAAAAA"
+            android:layout_marginBottom="16dp" />
 
-                <Button
-                    android:id="@+id/btnUpdateProduct"
-                    android:text="Update Product"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:backgroundTint="#28A745"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+        <EditText
+            android:id="@+id/editProductPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Price (EGP)"
+            android:inputType="numberDecimal"
+            android:background="@drawable/rounded_input"
+            android:padding="14dp"
+            android:textColor="#333333"
+            android:textColorHint="#AAAAAA"
+            android:layout_marginBottom="16dp" />
 
-                <Button
-                    android:id="@+id/btnDeleteProduct"
-                    android:text="Delete Product"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:backgroundTint="#DC3545"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </ScrollView>
+        <EditText
+            android:id="@+id/editProductQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quantity"
+            android:inputType="number"
+            android:background="@drawable/rounded_input"
+            android:padding="14dp"
+            android:textColor="#333333"
+            android:textColorHint="#AAAAAA"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/editProductDescription"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:hint="Description"
+            android:gravity="top|start"
+            android:background="@drawable/rounded_input"
+            android:padding="14dp"
+            android:textColor="#333333"
+            android:textColorHint="#AAAAAA"
+            android:layout_marginBottom="28dp" />
+
+        <!-- ▫️ Action Buttons (Update + Delete) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnUpdateProduct"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Update Product"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#28A745"
+                android:elevation="2dp"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnDeleteProduct"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Delete Product"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#DC3545"
+                android:elevation="2dp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
     </LinearLayout>
-</RelativeLayout>
+</ScrollView>
