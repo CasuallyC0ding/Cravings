@@ -63,6 +63,9 @@
             android:name=".baseActivities.MainActivity"
             android:exported="false"
             android:label="Main" />
+        <activity android:name=".baseActivities.EditProductActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide
 import com.example.cravings.R
 
 class ProfileActivity : AppCompatActivity() {
-
+    private var selectedImageUri: Uri? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole: String? = null

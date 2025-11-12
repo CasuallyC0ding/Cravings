@@ -16,6 +16,17 @@
         android:padding="16dp"
         android:background="#FFFFFF">
 
+        <!-- 🖼 Product Image -->
+        <ImageView
+            android:id="@+id/imgProductPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_camera"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_input" />
+
+        <!-- 🏷 Product Info -->
         <TextView
             android:id="@+id/txtProductName"
             android:layout_width="wrap_content"
@@ -44,5 +55,6 @@
             android:text="Stock: 0"
             android:textSize="14sp"
             android:textColor="#666666"/>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
