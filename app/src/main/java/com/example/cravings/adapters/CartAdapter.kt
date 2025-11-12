@@ -34,7 +34,6 @@ class CartAdapter(
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
         val product = cartItems[position]
-
         holder.productName.text = product.name
         holder.productPrice.text = "EGP ${product.price}"
         holder.productDescription.text = product.description

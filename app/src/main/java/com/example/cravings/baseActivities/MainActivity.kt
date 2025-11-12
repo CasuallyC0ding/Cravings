@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Start the RoleSelectionActivity by default
         val intent = Intent(this, RoleSelectionActivity::class.java)
         startActivity(intent)

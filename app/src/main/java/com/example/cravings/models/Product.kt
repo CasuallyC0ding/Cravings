@@ -10,7 +10,7 @@ data class Product(
     var imageUrl: String? = null,
     var stock: Int? = null,
     var productId: Int? = null,
-    var selectedQuantity: Int = 0   // keep track of selected quantity
+    var selectedQuantity: Int = 0
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),

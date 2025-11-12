@@ -1,82 +1,133 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <!-- Background -->
-    <ImageView
+    <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg_light"
-        android:contentDescription="Background" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-    <!-- Dark gradient overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Foreground content -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🍴"
+                android:textSize="24sp"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cravings"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FF8C00"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/profileButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_profile_placeholder"
+            android:background="@drawable/circle_background"
+            android:clipToOutline="true"
+            android:contentDescription="Profile" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- ✅ Top Bar moved here -->
         <LinearLayout
-            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_input"
+            android:padding="4dp"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/searchInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Search restaurants..."
+                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:background="@android:color/transparent"
+                android:padding="12dp"
+                android:inputType="text" />
+
+            <Button
+                android:id="@+id/searchButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="🔍"
+                android:textSize="18sp"
+                android:backgroundTint="#FF8C00"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/roleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Welcome back"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textColor="#0A2239"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:fontFamily="sans-serif-medium" />
+<!--            <Button-->
+<!--                android:id="@+id/btnCuisine"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Cuisine"-->
+<!--                android:textColor="#FFA500"-->
+<!--                android:background="@drawable/rounded_input"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:padding="12dp" />-->
 
-
-            <ImageView
-                android:id="@+id/profileButton"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_profile_placeholder"
-                android:background="@drawable/circle_background"
-                android:clipToOutline="true" />
+<!--            <Button-->
+<!--                android:id="@+id/btnRating"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Rating"-->
+<!--                android:textColor="#FFA500"-->
+<!--                android:background="@drawable/rounded_input"-->
+<!--                android:padding="12dp" />-->
         </LinearLayout>
 
-        <!-- Section Title -->
         <TextView
-            android:id="@+id/titleText"
+            android:id="@+id/roleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nearby Shops"
-            android:textColor="#FBEFD9"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/dancing_script_semibold"
-            android:layout_marginBottom="8dp" />
+            android:text="Welcome back!"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
-        <!-- List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/shopsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="16dp" />
-
     </LinearLayout>
-
 </RelativeLayout>
