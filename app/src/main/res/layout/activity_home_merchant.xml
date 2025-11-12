@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,68 +19,102 @@
         android:layout_height="match_parent"
         android:background="@drawable/dark_gradient_overlay" />
 
-    <!-- Top Bar -->
+    <!-- Foreground layout -->
     <LinearLayout
-        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/roleText"
-            android:layout_width="wrap_content"
+        <!-- Top Bar -->
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="MERCHANT"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFD180"
-            android:layout_weight="1"
-            android:fontFamily="@font/dancing_script_semibold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
 
+            <TextView
+                android:id="@+id/roleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MERCHANT"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFD180"
+                android:layout_weight="1"
+                android:fontFamily="@font/dancing_script_semibold" />
+
+            <ImageView
+                android:id="@+id/profileButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_profile_placeholder"
+                android:background="@drawable/circle_background"
+                android:clipToOutline="true"
+                android:contentDescription="Profile" />
+        </LinearLayout>
+
+        <!-- Profile Image -->
         <ImageView
-            android:id="@+id/profileButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="end"
+            android:id="@+id/profileImage"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:src="@drawable/ic_profile_placeholder"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/circle_background"
+            android:scaleType="centerCrop"
             android:clipToOutline="true"
-            android:contentDescription="Profile" />
+            android:contentDescription="Merchant Profile Image" />
+
+        <!-- Welcome Text -->
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to Your Merchant Dashboard!"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dancing_script_semibold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Tabs + ViewPager -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:tabTextColor="#BDBDBD"
+            android:tabIndicatorColor="#FFA500"
+            android:tabSelectedTextColor="#FFFFFF"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent" />
+
+        <!-- Optional Action Button -->
+        <Button
+            android:id="@+id/manageProductsBtn"
+            android:text="Manage Products"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_orange_gradient"
+            android:elevation="6dp"
+            android:padding="14dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
     </LinearLayout>
-
-    <!-- ViewPager2 for fragments -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/topBar"
-        android:layout_above="@id/tabLayout" />
-
-    <!-- Bottom TabLayout -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/tab_layout_background"
-        app:tabTextColor="#FFFFFF"
-        app:tabSelectedTextColor="#FFD180"
-        app:tabIndicatorColor="#FFD180"
-        app:tabIndicatorHeight="3dp">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Products" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Orders" />
-
-    </com.google.android.material.tabs.TabLayout>
-
 </RelativeLayout>
