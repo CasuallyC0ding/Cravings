@@ -23,7 +23,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_revert"
             android:contentDescription="Back"
-            app:tint="#28A745" />
+            app:tint="#FF8C00" />
 
         <TextView
             android:layout_width="0dp"
@@ -54,7 +54,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
-        android:backgroundTint="#28A745"
+        android:backgroundTint="#FF8C00"
         android:tint="@android:color/white"
-        app:srcCompat="@drawable/ic_profile_placeholder" />
+        app:srcCompat="@drawable/ic_add" />
 </RelativeLayout>

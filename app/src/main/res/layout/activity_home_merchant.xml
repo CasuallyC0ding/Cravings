@@ -36,11 +36,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="EasyOrder"
-                android:textSize="20sp"
+                android:text="Cravingsr"
+                android:textSize="25sp"
                 android:textStyle="bold"
-                android:textColor="#28A745"
-                android:fontFamily="sans-serif-medium" />
+                android:textColor="#FF8C00"
+                android:fontFamily="@font/dancing_script_bold" />
         </LinearLayout>
 
         <!-- Profile Button -->
@@ -72,7 +72,7 @@
         android:elevation="8dp"
         app:tabIconTint="@color/nav_item_color"
         app:tabTextColor="#757575"
-        app:tabSelectedTextColor="#28A745"
-        app:tabIndicatorColor="#28A745"
+        app:tabSelectedTextColor="#FF8C00"
+        app:tabIndicatorColor="#FF8C00"
         app:tabIndicatorHeight="3dp" />
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +35,7 @@ class AddProductActivity : AppCompatActivity() {
     private lateinit var saveBtn: Button
     private lateinit var uploadPhotoBtn: Button
     private lateinit var imagePreview: ImageView
+    private lateinit var backButton: ImageButton
 
     private var selectedImageUri: Uri? = null
 
@@ -56,6 +58,7 @@ class AddProductActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_product)
 
         // Initialize UI
+        backButton = findViewById(R.id.backButton)
         nameField = findViewById(R.id.editProductName)
         priceField = findViewById(R.id.editProductPrice)
         quantityField = findViewById(R.id.editProductQuantity)
@@ -63,7 +66,7 @@ class AddProductActivity : AppCompatActivity() {
         saveBtn = findViewById(R.id.btnSaveProduct)
         uploadPhotoBtn = findViewById(R.id.btnUploadPhoto)
         imagePreview = findViewById(R.id.imagePreview)
-
+        backButton.setOnClickListener { onBackPressed() }
         // Open gallery when clicking "Select Photo"
         uploadPhotoBtn.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
