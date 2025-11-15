@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +9,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- 🟩 Top Bar -->
+        <!-- Top bar -->
         <LinearLayout
             android:id="@+id/topBar"
             android:layout_width="match_parent"
@@ -40,7 +41,7 @@
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>
 
-        <!-- 🏪 Shop Name -->
+        <!-- Shop Name -->
         <TextView
             android:id="@+id/shopNameText"
             android:layout_width="match_parent"
@@ -54,7 +55,6 @@
             android:paddingTop="8dp"
             android:paddingBottom="4dp" />
 
-        <!-- 🛒 Cart List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewCart"
             android:layout_width="match_parent"
@@ -63,43 +63,121 @@
             android:padding="8dp"
             android:scrollbars="vertical" />
 
-        <!-- 💰 Bottom Section -->
+        <!-- Bottom Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
+            android:padding="8dp"
             android:background="#FFFFFF"
             android:elevation="8dp">
 
-            <!-- Total -->
+            <!-- Pickup method -->
             <LinearLayout
+                android:id="@+id/pickupSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:orientation="vertical"
+                android:padding="8dp">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Total"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#333333" />
-
-                <TextView
-                    android:id="@+id/totalPriceText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="EGP 0.00"
-                    android:textSize="20sp"
+                    android:text="Pickup Method"
                     android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:textSize="16sp"
+                    android:textColor="#333" />
+
+                <CheckBox
+                    android:id="@+id/checkShopPickup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shop Pickup"
+                    android:textSize="15sp" />
+
+                <CheckBox
+                    android:id="@+id/checkDelivery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery"
+                    android:textSize="15sp" />
             </LinearLayout>
 
-            <!-- Clear Cart Button -->
+            <!-- Delivery Section (hidden) -->
+            <LinearLayout
+                android:id="@+id/deliverySection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:background="#F8F8F8">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery Location"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/btnCurrentLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:text="Use Current Location" />
+
+                <Button
+                    android:id="@+id/btnSelectLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:text="Select From Map"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/selectedLocationText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No location selected"
+                    android:textColor="#333"
+                    android:textSize="14sp"
+                    android:paddingTop="8dp" />
+            </LinearLayout>
+
+            <!-- Delivery cost section (hidden) -->
+            <LinearLayout
+                android:id="@+id/deliveryCostSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtItemsTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Items Total: EGP 0.00"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/txtDeliveryFee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery Fee: EGP 0.00"
+                    android:textSize="15sp"
+                    android:paddingTop="4dp" />
+
+                <TextView
+                    android:id="@+id/txtFinalTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Final Total: EGP 0.00"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingTop="4dp" />
+            </LinearLayout>
+
+            <!-- Clear & Proceed -->
             <Button
                 android:id="@+id/clearCartButton"
                 android:layout_width="match_parent"
@@ -109,9 +187,8 @@
                 android:textStyle="bold"
                 android:textSize="15sp"
                 android:backgroundTint="@android:color/holo_red_light"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="8dp" />
 
-            <!-- Proceed Button -->
             <Button
                 android:id="@+id/proceedButton"
                 android:layout_width="match_parent"

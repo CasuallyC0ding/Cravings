@@ -247,7 +247,7 @@ class EditProductActivity : AppCompatActivity() {
     private fun deleteOldImageFromS3(imageUrl: String?) {
         if (imageUrl.isNullOrEmpty()) return
         try {
-            // Extract key correctly regardless of URL format
+            // Extract key while keeping subfolders (e.g., products/filename.jpg)
             val key = when {
                 imageUrl.contains(".amazonaws.com/") ->
                     imageUrl.substringAfter(".amazonaws.com/").substringBefore("?")
@@ -256,16 +256,22 @@ class EditProductActivity : AppCompatActivity() {
                 else -> null
             }
 
-            if (key != null && s3Client.doesObjectExist(BUCKET_NAME, key)) {
-                s3Client.deleteObject(DeleteObjectRequest(BUCKET_NAME, key))
-                Log.i(TAG, "✅ Deleted from S3: $key")
+            if (key != null) {
+                val decodedKey = java.net.URLDecoder.decode(key, "UTF-8") // in case of encoded URLs
+                if (s3Client.doesObjectExist(BUCKET_NAME, decodedKey)) {
+                    s3Client.deleteObject(DeleteObjectRequest(BUCKET_NAME, decodedKey))
+                    Log.i(TAG, "✅ Deleted from S3: $decodedKey")
+                } else {
+                    Log.w(TAG, "⚠️ Object not found in S3: $decodedKey")
+                }
             } else {
-                Log.w(TAG, "⚠️ Image key not found or object doesn't exist: $key")
+                Log.w(TAG, "⚠️ Could not extract key from URL: $imageUrl")
             }
         } catch (e: Exception) {
             Log.e(TAG, "❌ Failed to delete S3 image: ${e.message}", e)
         }
     }
+
 
 
     // --- Convert URI to File ---

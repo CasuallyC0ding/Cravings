@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mapPickerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".baseActivities.MapPickerActivity">
+
+    <!-- Map view -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Confirm button at the bottom -->
+    <Button
+        android:id="@+id/btnConfirmLocation"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Confirm Location"
+        android:layout_alignParentBottom="true"
+        android:backgroundTint="#28A745"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_margin="8dp"/>
+</RelativeLayout>

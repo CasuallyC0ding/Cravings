@@ -50,5 +50,11 @@ class HomeCustomerActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+        // Check if we should open Orders tab
+        val openOrdersTab = intent.getBooleanExtra("openOrdersTab", false)
+        if (openOrdersTab) {
+            viewPager.currentItem = 1 // index 1 = Orders tab
+        }
+
     }
 }

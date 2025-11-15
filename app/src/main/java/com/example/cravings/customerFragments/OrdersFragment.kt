@@ -1,25 +1,30 @@
 package com.example.cravings.customerFragments
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cravings.R
-import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.adapters.OrdersAdapter
+import com.example.cravings.models.Order
+import com.example.cravings.models.OrderItem
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.FirebaseDatabase
 
 class OrdersFragment : Fragment() {
-    private lateinit var roleTextView: TextView
-    private lateinit var profileButton: ImageView
+
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
-    private var userRole = "Customer"
+    private lateinit var ordersRecyclerView: RecyclerView
+    private lateinit var adapter: OrdersAdapter
+    private val ordersList = mutableListOf<Order>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,47 +36,82 @@ class OrdersFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        roleTextView = view.findViewById(R.id.roleText)
-        profileButton = view.findViewById(R.id.profileButton)
+        ordersRecyclerView = view.findViewById(R.id.ordersRecyclerView)
+        ordersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = OrdersAdapter(ordersList)
+        ordersRecyclerView.adapter = adapter
+        ordersRecyclerView.visibility = View.VISIBLE  // safe to set here
 
-        userRole = arguments?.getString("userRole") ?: "Customer"
-
-        loadUserName()
-        loadProfileImage()
-
-        profileButton.setOnClickListener {
-            startActivity(Intent(requireContext(), ProfileActivity::class.java)
-                .putExtra("userRole", userRole))
-        }
+        fetchCustomerOrders()  // fetch data after RecyclerView is ready
 
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadUserName()
-        loadProfileImage()
-    }
 
-    private fun loadUserName() {
+    private fun fetchCustomerOrders() {
         val uid = auth.currentUser?.uid ?: return
-        database.reference.child("users").child(userRole).child(uid)
-            .get().addOnSuccessListener {
-                val name = it.child("name").getValue(String::class.java)
-                roleTextView.text = "Welcome, ${name ?: "User"}!"
-            }
-    }
+        val customerOrdersRef = database.reference.child("users/Customer/$uid/orders")
 
-    private fun loadProfileImage() {
-        val uid = auth.currentUser?.uid ?: return
-        database.reference.child("users").child(userRole).child(uid)
-            .get().addOnSuccessListener {
-                Glide.with(requireContext())
-                    .load(it.child("profileImage").value)
-                    .placeholder(R.drawable.ic_profile_placeholder)
-                    .circleCrop()
-                    .into(profileButton)
+        customerOrdersRef.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) return@addOnSuccessListener
+
+            ordersList.clear()
+            val tasks = mutableListOf<Task<DataSnapshot>>()
+
+            for (shopSnap in snapshot.children) {
+                val shopUid = shopSnap.key ?: continue
+                for (orderSnap in shopSnap.children) {
+                    val orderId = orderSnap.key ?: continue
+                    val merchantOrderRef = database.reference.child("users/Merchant/$shopUid/orders/$uid/$orderId")
+                    tasks.add(merchantOrderRef.get())
+                }
             }
+
+            if (tasks.isEmpty()) {
+                adapter.notifyDataSetChanged()
+                return@addOnSuccessListener
+            }
+
+            Tasks.whenAllSuccess<DataSnapshot>(tasks).addOnSuccessListener { results ->
+                for (merchantSnap in results) {
+                    val snap = merchantSnap as DataSnapshot
+                    if (!snap.exists()) continue
+
+                    val items = snap.child("items").children.mapNotNull { itemSnap ->
+                        val productId = itemSnap.child("productId").getValue(Long::class.java)?.toInt() ?: 0
+                        val quantity = itemSnap.child("quantity").getValue(Long::class.java)?.toInt() ?: 0
+
+                        OrderItem(
+                            productId = productId,
+                            name = itemSnap.child("name").getValue(String::class.java),
+                            price = itemSnap.child("price").getValue(Double::class.java) ?: 0.0,
+                            quantity = quantity
+                        )
+                    }
+
+                    val order = Order(
+                        orderId = snap.key ?: "",
+                        shopUid = snap.ref.parent?.parent?.key ?: "",
+                        customerUid = uid,
+                        items = items,
+                        itemsTotal = snap.child("itemsTotal").getValue(Double::class.java) ?: 0.0,
+                        deliveryFee = snap.child("deliveryFee").getValue(Double::class.java) ?: 0.0,
+                        orderTotal = snap.child("orderTotal").getValue(Double::class.java) ?: 0.0,
+                        pickupMethod = snap.child("pickupMethod").getValue(String::class.java),
+                        deliveryLat = snap.child("deliveryLat").getValue(Double::class.java),
+                        deliveryLng = snap.child("deliveryLng").getValue(Double::class.java),
+                        status = snap.child("status").getValue(String::class.java),
+                        timestamp = snap.child("timestamp").getValue(Long::class.java),
+                        shopName = snap.child("shopName").getValue(String::class.java)
+                    )
+
+                    Log.d("OrdersFragment", "Order fetched: $order")
+                    ordersList.add(order)
+                }
+
+                adapter.notifyDataSetChanged()
+            }
+        }
     }
 
     companion object {
