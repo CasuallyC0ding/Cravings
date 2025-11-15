@@ -8,6 +8,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cravings.adapters.ProductAdapter
+import com.example.cravings.models.Product
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -17,7 +19,8 @@ class ProductActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var addItemBtn: FloatingActionButton
     private lateinit var adapter: ProductAdapter
-    private val productList = mutableListOf<ProductActivity>()
+
+    private val productList = mutableListOf<Product>()   // ✔ FIXED
 
     private lateinit var dbRef: DatabaseReference
     private val sellerId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -36,6 +39,7 @@ class ProductActivity : AppCompatActivity() {
         addItemBtn = findViewById(R.id.btnAddItem)
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
+
         adapter = ProductAdapter(productList) { product ->
             val intent = Intent(this, EditProductActivity::class.java)
             intent.putExtra("productId", product.productId)
@@ -54,7 +58,6 @@ class ProductActivity : AppCompatActivity() {
             .child("products")
 
         loadProducts()
-
     }
 
     private fun loadProducts() {
@@ -62,7 +65,7 @@ class ProductActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 productList.clear()
                 for (child in snapshot.children) {
-                    val product = child.getValue(ProductActivity::class.java)
+                    val product = child.getValue(Product::class.java)  // ✔ FIXED
                     if (product != null) productList.add(product)
                 }
                 adapter.notifyDataSetChanged()

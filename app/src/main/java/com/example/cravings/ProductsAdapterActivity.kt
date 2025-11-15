@@ -19,7 +19,7 @@ class ProductAdapter(
         val imgProduct: ImageView = view.findViewById(R.id.productImage)
         val txtName: TextView = view.findViewById(R.id.productName)
         val txtPrice: TextView = view.findViewById(R.id.productPrice)
-        val btnEdit: ImageButton = view.findViewById(R.id.btnEdit)
+//        val btnEdit: ImageButton = view.findViewById(R.id.btnEdit)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -42,7 +42,7 @@ class ProductAdapter(
             holder.imgProduct.setImageResource(R.drawable.ic_edit)
         }
 
-        holder.btnEdit.setOnClickListener { onEditClick(product) }
+//        holder.btnEdit.setOnClickListener { onEditClick(product) }
     }
 
     override fun getItemCount(): Int = productList.size
