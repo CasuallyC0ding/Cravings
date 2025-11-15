@@ -61,6 +61,8 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
 
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
@@ -73,6 +75,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity)
+    implementation ("org.osmdroid:osmdroid-android:6.1.14")
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
