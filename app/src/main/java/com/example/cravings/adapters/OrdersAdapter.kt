@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cravings.R
 import com.example.cravings.models.Order
-import com.example.cravings.models.OrderItem
 
 class OrdersAdapter(private val orders: List<Order>) :
     RecyclerView.Adapter<OrdersAdapter.OrderViewHolder>() {
@@ -29,20 +28,21 @@ class OrdersAdapter(private val orders: List<Order>) :
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
-        holder.shopText.text = "Shop: ${order.shopName}"
-        holder.statusText.text = "Status: ${order.status ?: "N/A"}"
-        holder.totalText.text = "Total: EGP %.2f".format(order.orderTotal ?: 0.0)
+        holder.shopText.text = order.shopName ?: "Shop"
+        holder.statusText.text = order.status ?: "Pending"
+        holder.totalText.text = "EGP %.2f".format(order.orderTotal ?: 0.0)
 
         holder.itemsContainer.removeAllViews()
         order.items?.forEach { item ->
             val itemView = LayoutInflater.from(holder.itemsContainer.context)
                 .inflate(R.layout.item_order_product, holder.itemsContainer, false)
+
             val txtName = itemView.findViewById<TextView>(R.id.txtProductName)
             val txtQuantity = itemView.findViewById<TextView>(R.id.txtProductQuantity)
             val txtPrice = itemView.findViewById<TextView>(R.id.txtProductPrice)
 
             txtName.text = item.name
-            txtQuantity.text = "Qty: ${item.quantity}"
+            txtQuantity.text = "${item.quantity}"
             txtPrice.text = "EGP %.2f".format(item.price ?: 0.0)
 
             holder.itemsContainer.addView(itemView)

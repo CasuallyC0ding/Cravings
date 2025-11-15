@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +25,8 @@ class OrdersFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private lateinit var ordersRecyclerView: RecyclerView
+    private lateinit var emptyStateLayout: LinearLayout
+    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: OrdersAdapter
     private val ordersList = mutableListOf<Order>()
 
@@ -37,38 +41,48 @@ class OrdersFragment : Fragment() {
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
         ordersRecyclerView = view.findViewById(R.id.ordersRecyclerView)
+        emptyStateLayout = view.findViewById(R.id.emptyStateLayout)
+        progressBar = view.findViewById(R.id.progressBar)
+
         ordersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = OrdersAdapter(ordersList)
         ordersRecyclerView.adapter = adapter
-        ordersRecyclerView.visibility = View.VISIBLE  // safe to set here
 
-        fetchCustomerOrders()  // fetch data after RecyclerView is ready
+        fetchCustomerOrders()
 
         return view
     }
 
-
     private fun fetchCustomerOrders() {
         val uid = auth.currentUser?.uid ?: return
+
+        progressBar.visibility = View.VISIBLE
+        emptyStateLayout.visibility = View.GONE
+        ordersRecyclerView.visibility = View.GONE
+
         val customerOrdersRef = database.reference.child("users/Customer/$uid/orders")
 
         customerOrdersRef.get().addOnSuccessListener { snapshot ->
-            if (!snapshot.exists()) return@addOnSuccessListener
+            if (!snapshot.exists() || !snapshot.hasChildren()) {
+                showEmptyState()
+                return@addOnSuccessListener
+            }
 
             ordersList.clear()
-            val tasks = mutableListOf<Task<DataSnapshot>>()
 
+            val tasks = mutableListOf<Task<DataSnapshot>>()
             for (shopSnap in snapshot.children) {
                 val shopUid = shopSnap.key ?: continue
                 for (orderSnap in shopSnap.children) {
                     val orderId = orderSnap.key ?: continue
-                    val merchantOrderRef = database.reference.child("users/Merchant/$shopUid/orders/$uid/$orderId")
+                    val merchantOrderRef =
+                        database.reference.child("users/Merchant/$shopUid/orders/$uid/$orderId")
                     tasks.add(merchantOrderRef.get())
                 }
             }
 
             if (tasks.isEmpty()) {
-                adapter.notifyDataSetChanged()
+                showEmptyState()
                 return@addOnSuccessListener
             }
 
@@ -80,7 +94,6 @@ class OrdersFragment : Fragment() {
                     val items = snap.child("items").children.mapNotNull { itemSnap ->
                         val productId = itemSnap.child("productId").getValue(Long::class.java)?.toInt() ?: 0
                         val quantity = itemSnap.child("quantity").getValue(Long::class.java)?.toInt() ?: 0
-
                         OrderItem(
                             productId = productId,
                             name = itemSnap.child("name").getValue(String::class.java),
@@ -109,9 +122,31 @@ class OrdersFragment : Fragment() {
                     ordersList.add(order)
                 }
 
-                adapter.notifyDataSetChanged()
+                progressBar.visibility = View.GONE
+
+                if (ordersList.isEmpty()) {
+                    showEmptyState()
+                } else {
+                    emptyStateLayout.visibility = View.GONE
+                    ordersRecyclerView.visibility = View.VISIBLE
+                    // Sort by timestamp descending (newest first)
+                    ordersList.sortByDescending { it.timestamp }
+                    adapter.notifyDataSetChanged()
+                }
+            }.addOnFailureListener {
+                progressBar.visibility = View.GONE
+                showEmptyState()
             }
+        }.addOnFailureListener {
+            progressBar.visibility = View.GONE
+            showEmptyState()
         }
+    }
+
+    private fun showEmptyState() {
+        progressBar.visibility = View.GONE
+        emptyStateLayout.visibility = View.VISIBLE
+        ordersRecyclerView.visibility = View.GONE
     }
 
     companion object {

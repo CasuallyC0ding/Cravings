@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class HomeCustomerActivity : AppCompatActivity() {
+
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole: String = "Customer"
@@ -21,14 +22,11 @@ class HomeCustomerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_customer)
 
-        // Firebase
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        // Get role
         userRole = intent.getStringExtra("userRole") ?: "Customer"
 
-        // Setup ViewPager + Tabs
         tabLayout = findViewById(R.id.tabLayout)
         viewPager = findViewById(R.id.viewPager)
 
@@ -50,11 +48,10 @@ class HomeCustomerActivity : AppCompatActivity() {
                 }
             }
         }.attach()
-        // Check if we should open Orders tab
+
         val openOrdersTab = intent.getBooleanExtra("openOrdersTab", false)
         if (openOrdersTab) {
-            viewPager.currentItem = 1 // index 1 = Orders tab
+            viewPager.currentItem = 1
         }
-
     }
 }

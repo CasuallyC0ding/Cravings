@@ -31,7 +31,6 @@ class ShopsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ShopAdapter
     private lateinit var shopList: ArrayList<Shop>
-
     private lateinit var cartIcon: ImageView
     private lateinit var cartBadge: TextView
 
@@ -39,7 +38,6 @@ class ShopsFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
 
-    // 🔍 Search fields
     private lateinit var searchInput: EditText
     private lateinit var searchButton: Button
     private var fullShopList = arrayListOf<Shop>()
@@ -63,11 +61,9 @@ class ShopsFragment : Fragment() {
 
         userRole = arguments?.getString("userRole") ?: "Customer"
 
-        // Load user data
         loadUserName()
         loadProfileImage()
 
-        // Navigate to profile
         profileButton.setOnClickListener {
             startActivity(
                 Intent(requireContext(), ProfileActivity::class.java)
@@ -75,22 +71,18 @@ class ShopsFragment : Fragment() {
             )
         }
 
-        // Navigate to cart
         cartIcon.setOnClickListener {
             startActivity(Intent(requireContext(), CartActivity::class.java))
         }
 
-        // RecyclerView with 2-column grid layout
         recyclerView = view.findViewById(R.id.shopsRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         shopList = arrayListOf()
         adapter = ShopAdapter(shopList)
         recyclerView.adapter = adapter
 
-        // Fetch shops
         fetchShops()
 
-        // 🔍 Live search as user types
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -99,7 +91,6 @@ class ShopsFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Optional search button
         searchButton.setOnClickListener {
             filterShops(searchInput.text.toString())
         }
@@ -122,7 +113,6 @@ class ShopsFragment : Fragment() {
                     val name = snapshot.child("name").getValue(String::class.java)
                     roleTextView.text = "Welcome, ${name ?: "User"}!"
                 }
-
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
@@ -138,7 +128,6 @@ class ShopsFragment : Fragment() {
                         .circleCrop()
                         .into(profileButton)
                 }
-
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
@@ -158,7 +147,6 @@ class ShopsFragment : Fragment() {
                     }
                     adapter.notifyDataSetChanged()
                 }
-
                 override fun onCancelled(error: DatabaseError) {}
             })
     }

@@ -23,7 +23,6 @@ class ShopProductsActivity : AppCompatActivity() {
     private lateinit var adapter: ProductAdapter
     private val productList = mutableListOf<Product>()
     private lateinit var database: FirebaseDatabase
-
     private lateinit var cartLayout: LinearLayout
     private lateinit var cartItemCount: TextView
     private lateinit var cartTotalPrice: TextView
@@ -42,6 +41,7 @@ class ShopProductsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_products)
+
         backButton = findViewById(R.id.backButton)
         recyclerView = findViewById(R.id.recyclerViewProducts)
         cartLayout = findViewById(R.id.cartLayout)
@@ -56,7 +56,6 @@ class ShopProductsActivity : AppCompatActivity() {
         shopNameText.text = shopName
 
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
-
 
         backButton.setOnClickListener { onBackPressed() }
 
@@ -76,7 +75,6 @@ class ShopProductsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Re-sync quantities if using CartManager
         if (CartManager.getCartItems().isNotEmpty()) {
             productList.forEach { product ->
                 val cartProduct = if (CartManager.shopId == intent.getStringExtra("shopId")) {
@@ -91,10 +89,8 @@ class ShopProductsActivity : AppCompatActivity() {
 
     private fun handleCartInteraction(product: Product, shopName: String, shopId: String) {
         if (CartManager.getCartItems().isNotEmpty() && CartManager.shopId != shopId) {
-            // Temporarily revert change before showing dialog
             product.selectedQuantity = (product.selectedQuantity - 1).coerceAtLeast(0)
             adapter.notifyDataSetChanged()
-
             showClearCartDialog {
                 CartManager.clearCart()
                 CartManager.shopId = shopId
@@ -135,7 +131,6 @@ class ShopProductsActivity : AppCompatActivity() {
     private fun updateCartUI() {
         val totalItems = CartManager.getTotalItems()
         val totalPrice = CartManager.getTotalPrice()
-
         if (totalItems == 0) {
             cartLayout.visibility = View.GONE
         } else {

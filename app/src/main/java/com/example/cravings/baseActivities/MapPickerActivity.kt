@@ -21,25 +21,19 @@ class MapPickerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // IMPORTANT: initialize OSMDroid configuration
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
-
         setContentView(R.layout.activity_map_picker)
 
         mapView = findViewById(R.id.mapView)
         btnConfirm = findViewById(R.id.btnConfirmLocation)
 
-        // basic map setup
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(15.0)
 
-        // center map somewhere default (optional)
-        val defaultPoint = GeoPoint(30.0444, 31.2357) // Cairo, Egypt
+        val defaultPoint = GeoPoint(30.0444, 31.2357)
         mapView.controller.setCenter(defaultPoint)
 
-        // tap listener to place a marker
         mapView.setOnTouchListener { _, event ->
             val projection = mapView.projection
             val geo = projection.fromPixels(event.x.toInt(), event.y.toInt()) as GeoPoint
@@ -64,9 +58,7 @@ class MapPickerActivity : AppCompatActivity() {
     }
 
     private fun placeMarker(point: GeoPoint) {
-        // remove previous marker if exists
         marker?.let { mapView.overlays.remove(it) }
-
         marker = Marker(mapView)
         marker?.position = point
         marker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)

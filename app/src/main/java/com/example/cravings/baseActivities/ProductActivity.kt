@@ -74,11 +74,7 @@ class ProductActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    this@ProductActivity,
-                    "Failed to load products",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@ProductActivity, "Failed to load products", Toast.LENGTH_SHORT).show()
             }
         })
     }
