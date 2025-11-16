@@ -14,11 +14,8 @@ import com.example.cravings.R
 import com.example.cravings.adapters.OrdersAdapter
 import com.example.cravings.models.Order
 import com.example.cravings.models.OrderItem
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 
 class OrdersFragment : Fragment() {
 
@@ -29,6 +26,8 @@ class OrdersFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var adapter: OrdersAdapter
     private val ordersList = mutableListOf<Order>()
+
+    private val orderListeners = mutableMapOf<String, ValueEventListener>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,12 +47,12 @@ class OrdersFragment : Fragment() {
         adapter = OrdersAdapter(ordersList)
         ordersRecyclerView.adapter = adapter
 
-        fetchCustomerOrders()
+        fetchCustomerOrdersRealtime()
 
         return view
     }
 
-    private fun fetchCustomerOrders() {
+    private fun fetchCustomerOrdersRealtime() {
         val uid = auth.currentUser?.uid ?: return
 
         progressBar.visibility = View.VISIBLE
@@ -62,91 +61,153 @@ class OrdersFragment : Fragment() {
 
         val customerOrdersRef = database.reference.child("users/Customer/$uid/orders")
 
-        customerOrdersRef.get().addOnSuccessListener { snapshot ->
-            if (!snapshot.exists() || !snapshot.hasChildren()) {
-                showEmptyState()
-                return@addOnSuccessListener
-            }
-
-            ordersList.clear()
-
-            val tasks = mutableListOf<Task<DataSnapshot>>()
-            for (shopSnap in snapshot.children) {
-                val shopUid = shopSnap.key ?: continue
-                for (orderSnap in shopSnap.children) {
-                    val orderId = orderSnap.key ?: continue
-                    val merchantOrderRef =
-                        database.reference.child("users/Merchant/$shopUid/orders/$uid/$orderId")
-                    tasks.add(merchantOrderRef.get())
-                }
-            }
-
-            if (tasks.isEmpty()) {
-                showEmptyState()
-                return@addOnSuccessListener
-            }
-
-            Tasks.whenAllSuccess<DataSnapshot>(tasks).addOnSuccessListener { results ->
-                for (merchantSnap in results) {
-                    val snap = merchantSnap as DataSnapshot
-                    if (!snap.exists()) continue
-
-                    val items = snap.child("items").children.mapNotNull { itemSnap ->
-                        val productId = itemSnap.child("productId").getValue(Long::class.java)?.toInt() ?: 0
-                        val quantity = itemSnap.child("quantity").getValue(Long::class.java)?.toInt() ?: 0
-                        OrderItem(
-                            productId = productId,
-                            name = itemSnap.child("name").getValue(String::class.java),
-                            price = itemSnap.child("price").getValue(Double::class.java) ?: 0.0,
-                            quantity = quantity
-                        )
-                    }
-
-                    val order = Order(
-                        orderId = snap.key ?: "",
-                        shopUid = snap.ref.parent?.parent?.key ?: "",
-                        customerUid = uid,
-                        items = items,
-                        itemsTotal = snap.child("itemsTotal").getValue(Double::class.java) ?: 0.0,
-                        deliveryFee = snap.child("deliveryFee").getValue(Double::class.java) ?: 0.0,
-                        orderTotal = snap.child("orderTotal").getValue(Double::class.java) ?: 0.0,
-                        pickupMethod = snap.child("pickupMethod").getValue(String::class.java),
-                        deliveryLat = snap.child("deliveryLat").getValue(Double::class.java),
-                        deliveryLng = snap.child("deliveryLng").getValue(Double::class.java),
-                        status = snap.child("status").getValue(String::class.java),
-                        timestamp = snap.child("timestamp").getValue(Long::class.java),
-                        shopName = snap.child("shopName").getValue(String::class.java)
-                    )
-
-                    Log.d("OrdersFragment", "Order fetched: $order")
-                    ordersList.add(order)
-                }
-
-                progressBar.visibility = View.GONE
-
-                if (ordersList.isEmpty()) {
+        // Listen to customer's order references
+        customerOrdersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists() || !snapshot.hasChildren()) {
                     showEmptyState()
-                } else {
-                    emptyStateLayout.visibility = View.GONE
-                    ordersRecyclerView.visibility = View.VISIBLE
-                    // Sort by timestamp descending (newest first)
-                    ordersList.sortByDescending { it.timestamp }
-                    adapter.notifyDataSetChanged()
+                    return
                 }
-            }.addOnFailureListener {
-                progressBar.visibility = View.GONE
+
+                // Clear existing listeners
+                removeAllOrderListeners()
+                ordersList.clear()
+
+                // Set up listeners for each merchant's orders
+                for (shopSnap in snapshot.children) {
+                    val shopUid = shopSnap.key ?: continue
+                    for (orderSnap in shopSnap.children) {
+                        val orderId = orderSnap.key ?: continue
+                        setupOrderListener(uid, shopUid, orderId)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("OrdersFragment", "Error: ${error.message}")
                 showEmptyState()
             }
-        }.addOnFailureListener {
-            progressBar.visibility = View.GONE
-            showEmptyState()
+        })
+    }
+
+    private fun setupOrderListener(customerUid: String, shopUid: String, orderId: String) {
+        val merchantOrderRef = database.reference
+            .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
+
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    // Order was deleted
+                    removeOrderFromList(orderId)
+                    return
+                }
+
+                val items = snapshot.child("items").children.mapNotNull { itemSnap ->
+                    val productId = itemSnap.child("productId").getValue(Long::class.java)?.toInt() ?: 0
+                    val quantity = itemSnap.child("quantity").getValue(Long::class.java)?.toInt() ?: 0
+                    OrderItem(
+                        productId = productId,
+                        name = itemSnap.child("name").getValue(String::class.java),
+                        price = itemSnap.child("price").getValue(Double::class.java) ?: 0.0,
+                        quantity = quantity
+                    )
+                }
+
+                val order = Order(
+                    orderId = orderId,
+                    shopUid = shopUid,
+                    customerUid = customerUid,
+                    items = items,
+                    itemsTotal = snapshot.child("itemsTotal").getValue(Double::class.java) ?: 0.0,
+                    deliveryFee = snapshot.child("deliveryFee").getValue(Double::class.java) ?: 0.0,
+                    orderTotal = snapshot.child("orderTotal").getValue(Double::class.java) ?: 0.0,
+                    pickupMethod = snapshot.child("pickupMethod").getValue(String::class.java),
+                    deliveryLat = snapshot.child("deliveryLat").getValue(Double::class.java),
+                    deliveryLng = snapshot.child("deliveryLng").getValue(Double::class.java),
+                    status = snapshot.child("status").getValue(String::class.java),
+                    timestamp = snapshot.child("timestamp").getValue(Long::class.java),
+                    shopName = snapshot.child("shopName").getValue(String::class.java)
+                )
+
+                updateOrderInList(order)
+                Log.d("OrdersFragment", "Order updated: ${order.orderId} - ${order.shopName}")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("OrdersFragment", "Order listener error: ${error.message}")
+            }
         }
+
+        merchantOrderRef.addValueEventListener(listener)
+        orderListeners["$shopUid-$orderId"] = listener
+    }
+
+    private fun updateOrderInList(order: Order) {
+        val existingIndex = ordersList.indexOfFirst { it.orderId == order.orderId }
+
+        if (existingIndex != -1) {
+            // Update existing order
+            ordersList[existingIndex] = order
+        } else {
+            // Add new order
+            ordersList.add(order)
+        }
+
+        // Sort by timestamp (newest first)
+        ordersList.sortByDescending { it.timestamp }
+
+        progressBar.visibility = View.GONE
+        emptyStateLayout.visibility = View.GONE
+        ordersRecyclerView.visibility = View.VISIBLE
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun removeOrderFromList(orderId: String) {
+        val removed = ordersList.removeAll { it.orderId == orderId }
+        if (removed) {
+            Log.d("OrdersFragment", "Order removed: $orderId")
+            if (ordersList.isEmpty()) {
+                showEmptyState()
+            } else {
+                adapter.notifyDataSetChanged()
+            }
+        }
+    }
+
+    private fun removeAllOrderListeners() {
+        orderListeners.forEach { (key, listener) ->
+            val parts = key.split("-")
+            if (parts.size == 2) {
+                val shopUid = parts[0]
+                val orderId = parts[1]
+                val customerUid = auth.currentUser?.uid ?: return
+                database.reference
+                    .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
+                    .removeEventListener(listener)
+            }
+        }
+        orderListeners.clear()
     }
 
     private fun showEmptyState() {
         progressBar.visibility = View.GONE
         emptyStateLayout.visibility = View.VISIBLE
         ordersRecyclerView.visibility = View.GONE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        removeAllOrderListeners()
+
+        // Also remove the customer orders listener
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            database.reference.child("users/Customer/$uid/orders")
+                .removeEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {}
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+        }
     }
 
     companion object {

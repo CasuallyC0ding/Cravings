@@ -1,11 +1,13 @@
 package com.example.cravings.adapters
 
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cravings.R
 import com.example.cravings.models.Order
@@ -29,7 +31,29 @@ class OrdersAdapter(private val orders: List<Order>) :
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
         holder.shopText.text = order.shopName ?: "Shop"
-        holder.statusText.text = order.status ?: "Pending"
+
+        // Set status text
+        val statusText = order.status ?: "Pending"
+        holder.statusText.text = statusText.capitalize()
+
+        // Set status badge background color based on status
+        val backgroundColor = when (statusText.lowercase()) {
+            "waiting for seller approval", "pending" -> android.R.color.holo_orange_dark
+            "preparing", "accepted" -> android.R.color.holo_blue_dark
+            "rejected", "cancelled" -> android.R.color.holo_red_dark
+            "completed", "delivered" -> android.R.color.holo_green_dark
+            else -> android.R.color.darker_gray
+        }
+
+        // Create rounded background drawable
+        val drawable = GradientDrawable()
+        drawable.shape = GradientDrawable.RECTANGLE
+        drawable.cornerRadius = 20f // Rounded corners
+        drawable.setColor(ContextCompat.getColor(holder.itemView.context, backgroundColor))
+
+        holder.statusText.background = drawable
+        holder.statusText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.white))
+
         holder.totalText.text = "EGP %.2f".format(order.orderTotal ?: 0.0)
 
         holder.itemsContainer.removeAllViews()

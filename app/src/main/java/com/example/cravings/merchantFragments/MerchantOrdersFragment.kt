@@ -240,19 +240,13 @@ class MerchantOrdersFragment : Fragment() {
             }
         }
 
-        // Add card to container FIRST
-        ordersContainer.addView(card)
+        // Setup buttons BEFORE adding to container
+        val acceptBtn = card.findViewById<Button>(R.id.acceptBtn)
+        val rejectBtn = card.findViewById<Button>(R.id.rejectBtn)
 
-        // Then setup buttons AFTER the view is added
-        card.post {
-            val acceptBtn = card.findViewById<Button>(R.id.acceptBtn)
-            val rejectBtn = card.findViewById<Button>(R.id.rejectBtn)
-
-            if (acceptBtn == null || rejectBtn == null) {
-                Log.e("FIREBASE", "Buttons not found in card!")
-                return@post
-            }
-
+        if (acceptBtn == null || rejectBtn == null) {
+            Log.e("FIREBASE", "Buttons not found in card!")
+        } else {
             Log.d("FIREBASE", "Setting up buttons for order ${order.orderId} with status ${order.status}")
 
             when (order.status.lowercase()) {
@@ -262,14 +256,17 @@ class MerchantOrdersFragment : Fragment() {
                     acceptBtn.isClickable = true
                     rejectBtn.isClickable = true
 
+                    // Set click listeners with proper logging
                     acceptBtn.setOnClickListener {
                         Log.d("FIREBASE", "Accept button clicked for order ${order.orderId}")
                         acceptOrder(order)
                     }
+
                     rejectBtn.setOnClickListener {
                         Log.d("FIREBASE", "Reject button clicked for order ${order.orderId}")
                         rejectOrder(order.customerId, order.orderId)
                     }
+
                     Log.d("FIREBASE", "Buttons enabled and click listeners set")
                 }
                 "preparing", "accepted" -> {
@@ -292,6 +289,9 @@ class MerchantOrdersFragment : Fragment() {
                 }
             }
         }
+
+        // Add card to container LAST
+        ordersContainer.addView(card)
     }
 
     private fun rejectOrder(customerId: String, orderId: String) {
