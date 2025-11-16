@@ -186,7 +186,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/rejectBtn"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
@@ -195,11 +195,13 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:background="#D32F2F"
+                android:backgroundTint="#D32F2F"
                 android:layout_marginEnd="8dp"
-                android:elevation="2dp" />
+                android:clickable="true"
+                android:focusable="true"
+                android:enabled="true" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/acceptBtn"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
@@ -208,8 +210,10 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:background="#43A047"
-                android:elevation="2dp" />
+                android:backgroundTint="#43A047"
+                android:clickable="true"
+                android:focusable="true"
+                android:enabled="true" />
         </LinearLayout>
 
     </LinearLayout>
