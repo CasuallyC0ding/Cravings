@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_card"
+    android:padding="16dp"
+    android:layout_margin="12dp">
+
+    <TextView
+        android:id="@+id/orderIdText"
+        android:text="Order ID"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/customerIdText"
+        android:text="Customer ID"
+        android:textColor="#555555"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/orderStatusText"
+        android:text="Status"
+        android:textColor="#28A745"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/itemsText"
+        android:text="Items..."
+        android:textColor="#444444"
+        android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/acceptBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Accept"
+            android:backgroundTint="#28A745"
+            android:textColor="@android:color/white"/>
+
+        <Button
+            android:id="@+id/rejectBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Reject"
+            android:backgroundTint="#B00020"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="12dp"/>
+    </LinearLayout>
+
+</LinearLayout>
