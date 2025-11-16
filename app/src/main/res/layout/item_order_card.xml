@@ -1,62 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/rounded_card"
-    android:padding="16dp"
-    android:layout_margin="12dp">
-
-    <TextView
-        android:id="@+id/orderIdText"
-        android:text="Order ID"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#333333"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/customerIdText"
-        android:text="Customer ID"
-        android:textColor="#555555"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/orderStatusText"
-        android:text="Status"
-        android:textColor="#28A745"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/itemsText"
-        android:text="Items..."
-        android:textColor="#444444"
-        android:layout_marginBottom="12dp"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF">
 
-        <Button
-            android:id="@+id/acceptBtn"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Accept"
-            android:backgroundTint="#28A745"
-            android:textColor="@android:color/white"/>
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
 
-        <Button
-            android:id="@+id/rejectBtn"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Reject"
-            android:backgroundTint="#B00020"
-            android:textColor="@android:color/white"
-            android:layout_marginStart="12dp"/>
+            <!-- Left side: Order Info -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Order Details"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:fontFamily="sans-serif" />
+
+                <TextView
+                    android:id="@+id/orderIdText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Order #12345"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/customerIdText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Customer: John Doe"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif" />
+
+                <TextView
+                    android:id="@+id/orderTimeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nov 16, 2025 14:30"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <!-- Status Text (plain text, no badge) -->
+            <TextView
+                android:id="@+id/orderStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#FF9800"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Pickup Method -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pickup Method:"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:fontFamily="sans-serif" />
+
+            <TextView
+                android:id="@+id/pickupMethodText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivery"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Items Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Order Items"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium" />
+
+        <!-- Items Container -->
+        <TextView
+            android:id="@+id/itemsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Chicken bucket x2 - 500 EGP\n• Fries x1 - 100 EGP"
+            android:textSize="14sp"
+            android:textColor="#555555"
+            android:background="#F8F8F8"
+            android:padding="12dp"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Total Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Order Total"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/orderTotalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="620 EGP"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/rejectBtn"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="REJECT"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="#D32F2F"
+                android:layout_marginEnd="8dp"
+                android:elevation="2dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/acceptBtn"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="ACCEPT"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="#43A047"
+                android:elevation="2dp" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>
