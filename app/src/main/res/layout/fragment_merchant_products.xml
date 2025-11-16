@@ -46,7 +46,7 @@
                 android:text="Merchant Name"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="#FFFFFF"
                 android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="8dp" />
 
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:text="Shop Name"
                 android:textSize="18sp"
-                android:textColor="#28A745"
+                android:textColor="#FF8C00"
                 android:fontFamily="sans-serif"
                 android:layout_marginBottom="4dp" />
 
@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:text="Phone Number"
                 android:textSize="16sp"
-                android:textColor="#666666"
+                android:textColor="#FFFFFF"
                 android:fontFamily="sans-serif" />
         </LinearLayout>
 
@@ -78,7 +78,7 @@
             android:textColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:backgroundTint="#28A745"
+            android:backgroundTint="#FF8C00"
             android:textSize="16sp" />
     </LinearLayout>
 </ScrollView>

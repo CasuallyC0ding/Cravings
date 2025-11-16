@@ -1,47 +1,97 @@
 package com.example.cravings.baseActivities
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.mobileconnectors.s3.transferutility.*
+import com.amazonaws.regions.Region
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.example.cravings.R
 import com.example.cravings.models.Product_Merchant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.io.File
+import java.io.FileOutputStream
 
 class AddProductActivity : AppCompatActivity() {
 
+    // --- UI Elements ---
     private lateinit var nameField: EditText
     private lateinit var priceField: EditText
     private lateinit var quantityField: EditText
     private lateinit var descField: EditText
     private lateinit var saveBtn: Button
+    private lateinit var uploadPhotoBtn: Button
+    private lateinit var imagePreview: ImageView
+    private lateinit var backButton: ImageButton
 
-    private val sellerId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    private var selectedImageUri: Uri? = null
+
+    // --- AWS + Firebase ---
+    companion object {
+        private const val AWS_ACCESS_KEY = "" // your AWS key
+        private const val AWS_SECRET_KEY = "" // your AWS secret
+        private const val BUCKET_NAME = "craversbkt"
+    }
+
+    private val auth = FirebaseAuth.getInstance()
+    private val sellerId = auth.currentUser?.uid ?: ""
     private val dbRef =
         FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
     private val TAG = "AddProductActivity"
 
+    // --- Lifecycle ---
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_product)
 
+        // Initialize UI
+        backButton = findViewById(R.id.backButton)
         nameField = findViewById(R.id.editProductName)
         priceField = findViewById(R.id.editProductPrice)
         quantityField = findViewById(R.id.editProductQuantity)
         descField = findViewById(R.id.editProductDescription)
         saveBtn = findViewById(R.id.btnSaveProduct)
+        uploadPhotoBtn = findViewById(R.id.btnUploadPhoto)
+        imagePreview = findViewById(R.id.imagePreview)
+        backButton.setOnClickListener { onBackPressed() }
+        // Open gallery when clicking "Select Photo"
+        uploadPhotoBtn.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            imagePickerLauncher.launch(intent)
+        }
 
+        // Save product
         saveBtn.setOnClickListener { saveProduct() }
     }
 
+    // --- Image Picker Launcher ---
+    private val imagePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                selectedImageUri = result.data!!.data
+                imagePreview.setImageURI(selectedImageUri)
+                Toast.makeText(this, "Image selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    // --- 1. Save Product (Main entry point) ---
     private fun saveProduct() {
         if (sellerId.isEmpty()) {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
-            Log.e(TAG, "User not logged in – sellerId is empty.")
             return
         }
 
@@ -52,138 +102,146 @@ class AddProductActivity : AppCompatActivity() {
 
         if (name.isEmpty() || price <= 0) {
             Toast.makeText(this, "Please enter valid product details", Toast.LENGTH_SHORT).show()
-            Log.w(TAG, "Invalid product details entered: name='$name', price=$price")
             return
         }
 
         ensureMerchantPathExists {
             getNextProductId { nextId ->
-                val productMerchant = Product_Merchant(
-                    productId = nextId,
-                    name = name,
-                    price = price,
-                    stock = quantity,
-                    description = desc,
-                    imageUrl = ""
-                )
-
-                val productRef = dbRef.reference
-                    .child("users")
-                    .child("Merchant")
-                    .child(sellerId)
-                    .child("products")
-                    .child(nextId.toString())
-
-                productRef.setValue(productMerchant)
-                    .addOnSuccessListener {
-                        Log.i(TAG, "Product added successfully with ID $nextId")
-                        updateLastProductId(nextId)
-                        Toast.makeText(this, "Product added successfully!", Toast.LENGTH_SHORT)
-                            .show()
-
-                        val intent = Intent(this, ProductActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                        finish()
+                // If image is selected, upload it first
+                if (selectedImageUri != null) {
+                    uploadToS3(selectedImageUri!!) { imageUrl ->
+                        saveProductToFirebase(nextId, name, price, quantity, desc, imageUrl)
                     }
-                    .addOnFailureListener { ex ->
-                        Log.e(TAG, "Failed to save product: ${ex.message}", ex)
-                        Toast.makeText(this, "Failed to save: ${ex.message}", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                } else {
+                    // Save without image
+                    saveProductToFirebase(nextId, name, price, quantity, desc, "")
+                }
             }
         }
     }
 
+    // --- 2. Upload to S3 and return image URL ---
+    private fun uploadToS3(uri: Uri, onUploaded: (String) -> Unit) {
+        val file = getFileFromUri(uri) ?: return
+
+        val s3 = AmazonS3Client(
+            BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY),
+            Region.getRegion(Regions.EU_NORTH_1)
+        )
+        TransferNetworkLossHandler.getInstance(applicationContext)
+
+        val transferUtility = TransferUtility.builder()
+            .context(applicationContext)
+            .s3Client(s3)
+            .defaultBucket(BUCKET_NAME)
+            .build()
+
+        val key = "products/$sellerId/${System.currentTimeMillis()}.jpg"
+
+        val observer = transferUtility.upload(
+            BUCKET_NAME,
+            key,
+            file,
+            CannedAccessControlList.PublicRead
+        )
+
+        observer.setTransferListener(object : TransferListener {
+            override fun onStateChanged(id: Int, state: TransferState?) {
+                if (state == TransferState.COMPLETED) {
+                    val imageUrl = s3.getResourceUrl(BUCKET_NAME, key)
+                    onUploaded(imageUrl)
+                }
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                val progress = (bytesCurrent.toDouble() / bytesTotal * 100).toInt()
+                Log.d(TAG, "Upload progress: $progress%")
+            }
+
+            override fun onError(id: Int, ex: Exception?) {
+                Log.e(TAG, "S3 upload failed", ex)
+                Toast.makeText(this@AddProductActivity, "Upload failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    // --- 3. Write Product to Firebase ---
+    private fun saveProductToFirebase(
+        nextId: Int,
+        name: String,
+        price: Double,
+        quantity: Int,
+        desc: String,
+        imageUrl: String
+    ) {
+        val product = Product_Merchant(
+            productId = nextId,
+            name = name,
+            price = price,
+            stock = quantity,
+            description = desc,
+            imageUrl = imageUrl
+        )
+
+        val productRef = dbRef.reference
+            .child("users")
+            .child("Merchant")
+            .child(sellerId)
+            .child("products")
+            .child(nextId.toString())
+
+        productRef.setValue(product)
+            .addOnSuccessListener {
+                updateLastProductId(nextId)
+                Toast.makeText(this, "Product added successfully!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, ProductActivity::class.java))
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to save: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // --- 4. Firebase Helper Functions ---
     private fun ensureMerchantPathExists(onReady: () -> Unit) {
         val merchantRef = dbRef.reference.child("users").child("Merchant").child(sellerId)
         merchantRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    Log.w(TAG, "Merchant node not found. Creating structure.")
-                    val defaultData = mapOf(
-                        "lastProductId" to 0,
-                        "products" to mapOf<String, Any>()
-                    )
-                    merchantRef.setValue(defaultData)
-                        .addOnSuccessListener {
-                            Log.i(TAG, "Merchant structure created.")
-                            onReady()
-                        }
-                        .addOnFailureListener {
-                            Log.e(TAG, "Failed to create merchant structure: ${it.message}", it)
-                            Toast.makeText(
-                                this@AddProductActivity,
-                                "Error initializing merchant node",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                } else {
-                    if (!snapshot.hasChild("products")) {
-                        Log.w(TAG, "Merchant found but missing 'products' node. Creating it.")
-                        merchantRef.child("products").setValue(mapOf<String, Any>())
-                            .addOnSuccessListener {
-                                Log.i(TAG, "'products' node created successfully.")
-                                onReady()
-                            }
-                            .addOnFailureListener {
-                                Log.e(TAG, "Failed to create 'products' node: ${it.message}", it)
-                                Toast.makeText(
-                                    this@AddProductActivity,
-                                    "Error creating products node",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                    } else {
-                        Log.d(TAG, "Merchant and products path verified.")
-                        onReady()
-                    }
-                }
+                    val defaultData = mapOf("lastProductId" to 0, "products" to mapOf<String, Any>())
+                    merchantRef.setValue(defaultData).addOnSuccessListener { onReady() }
+                } else onReady()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Database error while ensuring path: ${error.message}")
-                Toast.makeText(
-                    this@AddProductActivity,
-                    "Database error: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@AddProductActivity, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun getNextProductId(callback: (Int) -> Unit) {
-        val lastIdRef =
-            dbRef.reference.child("users").child("Merchant").child(sellerId).child("lastProductId")
-
+        val lastIdRef = dbRef.reference.child("users").child("Merchant").child(sellerId).child("lastProductId")
         lastIdRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val lastId = snapshot.getValue(Int::class.java) ?: 0
-                val nextId = lastId + 1
-                Log.d(TAG, "Next product ID calculated: $nextId (last=$lastId)")
-                callback(nextId)
+                callback(lastId + 1)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Error fetching lastProductId: ${error.message}")
                 callback(1)
             }
         })
     }
 
     private fun updateLastProductId(newId: Int) {
-        val lastIdRef = dbRef.reference
-            .child("users")
-            .child("Merchant")
-            .child(sellerId)
-            .child("lastProductId")
+        dbRef.reference.child("users").child("Merchant").child(sellerId).child("lastProductId").setValue(newId)
+    }
 
-        lastIdRef.setValue(newId)
-            .addOnSuccessListener {
-                Log.d(TAG, "lastProductId updated to $newId")
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show()
-            }
+    // --- 5. Convert URI to File ---
+    private fun getFileFromUri(uri: Uri): File? {
+        val inputStream = contentResolver.openInputStream(uri) ?: return null
+        val file = File(cacheDir, "${System.currentTimeMillis()}.jpg")
+        inputStream.copyTo(FileOutputStream(file))
+        return file
     }
 }

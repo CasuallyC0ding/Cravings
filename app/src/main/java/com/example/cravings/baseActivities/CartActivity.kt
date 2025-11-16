@@ -2,9 +2,7 @@ package com.example.cravings.baseActivities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,78 +10,99 @@ import com.example.cravings.R
 import com.example.cravings.adapters.CartAdapter
 import com.example.cravings.models.Product
 import com.example.cravings.utils.CartManager
+import com.google.firebase.auth.FirebaseAuth
 
 class CartActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CartAdapter
-    private lateinit var totalPriceText: TextView
     private lateinit var proceedButton: Button
     private lateinit var clearCartButton: Button
     private lateinit var backButton: ImageButton
     private lateinit var shopNameText: TextView
+    private lateinit var txtItemsTotal: TextView
+    private lateinit var emptyCartLayout: LinearLayout
+    private lateinit var cartContentLayout: LinearLayout
 
+    private lateinit var auth: FirebaseAuth
     private var cartItems = mutableListOf<Product>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cart)
 
+        initViews()
+        setupRecyclerView()
+        setupButtons()
+        updateUI()
+    }
+
+    private fun initViews() {
         recyclerView = findViewById(R.id.recyclerViewCart)
-        totalPriceText = findViewById(R.id.totalPriceText)
         proceedButton = findViewById(R.id.proceedButton)
         backButton = findViewById(R.id.backButton)
         clearCartButton = findViewById(R.id.clearCartButton)
         shopNameText = findViewById(R.id.shopNameText)
+        txtItemsTotal = findViewById(R.id.txtItemsTotal)
+        emptyCartLayout = findViewById(R.id.emptyCartLayout)
+        cartContentLayout = findViewById(R.id.cartContentLayout)
 
-        // Get shop name if available
+        auth = FirebaseAuth.getInstance()
+
         shopNameText.text = CartManager.shopName ?: "Shop"
 
-        // Prefer CartManager items if it exists, otherwise from Intent
         cartItems = if (CartManager.getCartItems().isNotEmpty()) {
             CartManager.getCartItems()
         } else {
             intent.getParcelableArrayListExtra<Product>("cart")?.toMutableList() ?: mutableListOf()
         }
+    }
 
-        adapter = CartAdapter(cartItems) { updateTotalPrice() }
+    private fun setupRecyclerView() {
+        adapter = CartAdapter(cartItems) { updateUI() }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
 
-        updateTotalPrice()
-
-        // Go back
+    private fun setupButtons() {
         backButton.setOnClickListener { onBackPressed() }
 
-        // Proceed to checkout
-        proceedButton.setOnClickListener {
-            val resultIntent = Intent()
-            resultIntent.putParcelableArrayListExtra("updatedCart", ArrayList(cartItems))
-            setResult(RESULT_OK, resultIntent)
-            finish()
-        }
-
-        // Clear cart
         clearCartButton.setOnClickListener {
             CartManager.clearCart()
             cartItems.clear()
             adapter.notifyDataSetChanged()
-            updateTotalPrice()
+            updateUI()
+        }
+
+        proceedButton.setOnClickListener {
+            if (cartItems.isEmpty()) {
+                Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Navigate to CheckoutActivity
+            val intent = Intent(this, CheckoutActivity::class.java)
+            startActivity(intent)
         }
     }
 
-    private fun updateTotalPrice() {
-        val total = if (CartManager.getCartItems().isNotEmpty()) {
-            CartManager.getTotalPrice()
+    private fun updateUI() {
+        val itemsTotal = cartItems.sumOf { (it.price ?: 0.0) * it.selectedQuantity }
+
+        if (cartItems.isEmpty()) {
+            emptyCartLayout.visibility = android.view.View.VISIBLE
+            cartContentLayout.visibility = android.view.View.GONE
         } else {
-            cartItems.sumOf { (it.price ?: 0.0) * it.selectedQuantity }
+            emptyCartLayout.visibility = android.view.View.GONE
+            cartContentLayout.visibility = android.view.View.VISIBLE
+            txtItemsTotal.text = "Total: EGP %.2f".format(itemsTotal)
         }
-        totalPriceText.text = "EGP %.2f".format(total)
     }
 
     override fun onBackPressed() {
-        val resultIntent = Intent()
-        resultIntent.putParcelableArrayListExtra("updatedCart", ArrayList(cartItems))
+        val resultIntent = Intent().apply {
+            putParcelableArrayListExtra("updatedCart", ArrayList(cartItems))
+        }
         setResult(RESULT_OK, resultIntent)
         super.onBackPressed()
     }

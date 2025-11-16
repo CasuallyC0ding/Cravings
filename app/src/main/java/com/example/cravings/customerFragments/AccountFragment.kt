@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class AccountFragment : Fragment() {
+
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
     private lateinit var btnEditProfile: Button

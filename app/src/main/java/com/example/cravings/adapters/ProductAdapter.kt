@@ -34,7 +34,6 @@ class ProductAdapter(
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = productList[position]
-
         holder.productName.text = product.name
         holder.productPrice.text = "EGP ${product.price}"
         holder.productDescription.text = product.description
