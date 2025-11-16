@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.cravings.R
+import com.example.cravings.utils.CartManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.io.File
@@ -133,6 +134,7 @@ class ProfileActivity : AppCompatActivity() {
                 .setMessage("Are you sure?")
                 .setPositiveButton("Yes") { _, _ ->
                     auth.signOut()
+                    CartManager.clearCart()
                     startActivity(Intent(this, RoleSelectionActivity::class.java))
                     finish()
                 }
