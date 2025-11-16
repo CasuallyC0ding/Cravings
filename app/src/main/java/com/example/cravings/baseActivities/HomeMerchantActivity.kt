@@ -16,25 +16,28 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class HomeMerchantActivity : AppCompatActivity() {
+
     private lateinit var profileButton: ImageView
-    private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private var userRole: String = "Merchant"
+    private var userRole = "Merchant"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_merchant)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
-
-        userRole = intent.getStringExtra("userRole") ?: "Merchant"
+        database = FirebaseDatabase.getInstance(
+            "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
+        )
 
         profileButton = findViewById(R.id.profileButton)
         viewPager = findViewById(R.id.viewPager)
         tabLayout = findViewById(R.id.tabLayout)
+
+        userRole = intent.getStringExtra("userRole") ?: "Merchant"
 
         loadProfileImage()
 
@@ -44,8 +47,7 @@ class HomeMerchantActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val pagerAdapter = MerchantPagerAdapter(this)
-        viewPager.adapter = pagerAdapter
+        viewPager.adapter = MerchantPagerAdapter(this)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
@@ -67,24 +69,20 @@ class HomeMerchantActivity : AppCompatActivity() {
     }
 
     private fun loadProfileImage() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
+        val currentUser = auth.currentUser ?: return
 
-        val userId = currentUser.uid
-        val userRef = database.reference.child("users").child(userRole).child(userId)
+        val userRef = database.reference
+            .child("users").child(userRole).child(currentUser.uid)
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val imageUrl = snapshot.child("profileImage").getValue(String::class.java)
-                if (!imageUrl.isNullOrEmpty()) {
+                val url = snapshot.child("profileImage").value?.toString()
+
+                if (!url.isNullOrEmpty()) {
                     Glide.with(this@HomeMerchantActivity)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_profile_placeholder)
+                        .load(url)
                         .circleCrop()
+                        .placeholder(R.drawable.ic_profile_placeholder)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .into(profileButton)
