@@ -169,6 +169,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- Location Section (For Merchants Only) -->
+            <LinearLayout
+                android:id="@+id/locationSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:text="Shop Location"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif"
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/locationText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📍 No location set"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:padding="14dp"
+                    android:background="@drawable/rounded_input"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/setLocationBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="📍 Set Location"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#4CAF50"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
             <!-- Save Changes Button -->
             <Button
                 android:id="@+id/saveBtn"
