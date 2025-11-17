@@ -57,7 +57,6 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:background="@drawable/status_badge_bg"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:paddingTop="6dp"
@@ -98,7 +97,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingTop="8dp">
+            android:paddingTop="8dp"
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -119,6 +119,51 @@
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Delivery Confirmation Buttons (Only visible when Out for Delivery) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm Delivery Status:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:id="@+id/deliveryConfirmLabel"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnNotDelivered"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="❌ NOT DELIVERED"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="#F44336"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnDelivered"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="✅ DELIVERED"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="#4CAF50"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
