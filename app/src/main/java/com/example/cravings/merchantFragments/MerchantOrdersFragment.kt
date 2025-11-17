@@ -372,28 +372,49 @@ class MerchantOrdersFragment : Fragment() {
                             Log.e("FIREBASE", "Failed to update stock for product ${item.productId}: ${e.message}")
                         }
                 }
+                var text1=""
+                val ref = database.reference
+                    .child("users")
+                    .child(userRole)
+                    .child(merchantId)
+                    .child("orders")
+                    .child(order.customerId)
+                    .child(order.orderId)
+                    .child("pickupMethod")
+
+                ref.get().addOnSuccessListener { snapshot ->
+                    val method = snapshot.getValue(String::class.java)
+
+                    text1 = if (method == "delivery") {
+                        "Waiting for Delivery"
+                    } else {
+                        "Order Ready"
+                    }
+
+                    database.reference.child("users").child(userRole)
+                        .child(merchantId).child("orders")
+                        .child(order.customerId).child(order.orderId).child("status")
+                        .setValue(text1)
+                        .addOnSuccessListener {
+                            Log.d("FIREBASE", "Order status updated to preparing")
+                            Toast.makeText(
+                                requireContext(),
+                                "Order Accepted - Stock Updated",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FIREBASE", "Failed to update order status: ${e.message}")
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to accept order: ${e.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                }
 
                 // Update order status
-                database.reference.child("users").child(userRole)
-                    .child(merchantId).child("orders")
-                    .child(order.customerId).child(order.orderId).child("status")
-                    .setValue("preparing")
-                    .addOnSuccessListener {
-                        Log.d("FIREBASE", "Order status updated to preparing")
-                        Toast.makeText(
-                            requireContext(),
-                            "Order Accepted - Stock Updated",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FIREBASE", "Failed to update order status: ${e.message}")
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed to accept order: ${e.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+
             }
 
             override fun onCancelled(error: DatabaseError) {
