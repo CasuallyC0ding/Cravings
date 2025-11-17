@@ -238,6 +238,93 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Delivery Points Discount Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="2dp"
+            android:background="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <CheckBox
+                    android:id="@+id/checkboxUsePoints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💰 Use Delivery Points"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:buttonTint="#4CAF50"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp" />
+
+                <!-- Points Input Layout (Initially Hidden) -->
+                <LinearLayout
+                    android:id="@+id/pointsDiscountLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp"
+                    android:background="#F9FFF9"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/txtAvailablePoints"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Available Points: EGP 0.00"
+                        android:textSize="14sp"
+                        android:textColor="#4CAF50"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Enter amount to use (EGP):"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/editTextPointsToUse"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:minHeight="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/rounded_input"
+                        android:textSize="15sp"
+                        android:textColor="#333333"
+                        android:textColorHint="#999999"
+                        android:layout_marginBottom="8dp" />
+
+                    <Button
+                        android:id="@+id/btnApplyPoints"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Apply Discount"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:backgroundTint="#4CAF50" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- Order Summary Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -310,6 +397,32 @@
                         android:textSize="15sp"
                         android:textColor="#333333"
                         android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/discountRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Discount"
+                        android:textSize="15sp"
+                        android:textColor="#4CAF50" />
+
+                    <TextView
+                        android:id="@+id/txtDiscount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="- EGP 0.00"
+                        android:textSize="15sp"
+                        android:textColor="#4CAF50"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <View

@@ -47,6 +47,18 @@
                     android:textColor="#666666"
                     android:layout_marginTop="4dp"
                     android:fontFamily="sans-serif" />
+                <ImageButton
+                    android:id="@+id/btnViewLocation"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_round_green"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_map"
+                    android:contentDescription="View Location"
+                    app:tint="@android:color/white" />
+
+
             </LinearLayout>
 
             <TextView

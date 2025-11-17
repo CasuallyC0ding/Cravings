@@ -8,6 +8,8 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,6 +34,7 @@ class CheckoutActivity : AppCompatActivity() {
     private lateinit var shopNameText: TextView
     private lateinit var txtItemsTotal: TextView
     private lateinit var txtDeliveryFee: TextView
+    private lateinit var txtDiscount: TextView
     private lateinit var txtFinalTotal: TextView
 
     private lateinit var radioShopPickup: RadioButton
@@ -46,6 +49,12 @@ class CheckoutActivity : AppCompatActivity() {
     private lateinit var btnConfirmAddress: Button
     private lateinit var selectedLocationText: TextView
 
+    private lateinit var checkboxUsePoints: CheckBox
+    private lateinit var pointsDiscountLayout: LinearLayout
+    private lateinit var txtAvailablePoints: TextView
+    private lateinit var editTextPointsToUse: EditText
+    private lateinit var btnApplyPoints: Button
+
     private lateinit var btnPlaceOrder: Button
 
     private lateinit var auth: FirebaseAuth
@@ -57,6 +66,8 @@ class CheckoutActivity : AppCompatActivity() {
     private var storeLat: Double? = null
     private var storeLng: Double? = null
     private var deliveryFee = 0.0
+    private var discountAmount = 0.0
+    private var availablePoints = 0.0
     private var fetchedStoreLocation = false
 
     private val mapPickerLauncher = registerForActivityResult(
@@ -82,6 +93,7 @@ class CheckoutActivity : AppCompatActivity() {
         initViews()
         setupListeners()
         loadCartData()
+        loadAvailablePoints()
         fetchStoreLocation()
     }
 
@@ -90,6 +102,7 @@ class CheckoutActivity : AppCompatActivity() {
         shopNameText = findViewById(R.id.shopNameText)
         txtItemsTotal = findViewById(R.id.txtItemsTotal)
         txtDeliveryFee = findViewById(R.id.txtDeliveryFee)
+        txtDiscount = findViewById(R.id.txtDiscount)
         txtFinalTotal = findViewById(R.id.txtFinalTotal)
 
         radioShopPickup = findViewById(R.id.radioShopPickup)
@@ -103,6 +116,12 @@ class CheckoutActivity : AppCompatActivity() {
         editTextAddress = findViewById(R.id.editTextAddress)
         btnConfirmAddress = findViewById(R.id.btnConfirmAddress)
         selectedLocationText = findViewById(R.id.selectedLocationText)
+
+        checkboxUsePoints = findViewById(R.id.checkboxUsePoints)
+        pointsDiscountLayout = findViewById(R.id.pointsDiscountLayout)
+        txtAvailablePoints = findViewById(R.id.txtAvailablePoints)
+        editTextPointsToUse = findViewById(R.id.editTextPointsToUse)
+        btnApplyPoints = findViewById(R.id.btnApplyPoints)
 
         btnPlaceOrder = findViewById(R.id.btnPlaceOrder)
 
@@ -157,6 +176,21 @@ class CheckoutActivity : AppCompatActivity() {
             geocodeAddress(address)
         }
 
+        checkboxUsePoints.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                pointsDiscountLayout.visibility = View.VISIBLE
+            } else {
+                pointsDiscountLayout.visibility = View.GONE
+                discountAmount = 0.0
+                editTextPointsToUse.text.clear()
+                updateTotals()
+            }
+        }
+
+        btnApplyPoints.setOnClickListener {
+            applyPointsDiscount()
+        }
+
         btnPlaceOrder.setOnClickListener {
             placeOrder()
         }
@@ -167,13 +201,63 @@ class CheckoutActivity : AppCompatActivity() {
         updateTotals()
     }
 
+    private fun loadAvailablePoints() {
+        val uid = auth.currentUser?.uid ?: return
+        database.reference.child("users").child("Customer").child(uid).child("deliveryPoints")
+            .get().addOnSuccessListener { snapshot ->
+                availablePoints = snapshot.getValue(Double::class.java) ?: 0.0
+                txtAvailablePoints.text = "Available Points: EGP %.2f".format(availablePoints)
+
+                if (availablePoints <= 0) {
+                    checkboxUsePoints.isEnabled = false
+                    checkboxUsePoints.text = "💰 Use Delivery Points (No points available)"
+                }
+            }
+    }
+
+    private fun applyPointsDiscount() {
+        val pointsText = editTextPointsToUse.text.toString().trim()
+
+        if (pointsText.isEmpty()) {
+            Toast.makeText(this, "Please enter points amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val pointsToUse = pointsText.toDoubleOrNull()
+
+        if (pointsToUse == null || pointsToUse <= 0) {
+            Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (pointsToUse > availablePoints) {
+            Toast.makeText(this, "Insufficient points. Available: EGP %.2f".format(availablePoints), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val itemsTotal = cartItems.sumOf { (it.price ?: 0.0) * it.selectedQuantity }
+        val subtotal = itemsTotal + deliveryFee
+
+        if (pointsToUse > subtotal) {
+            Toast.makeText(this, "Discount cannot exceed order total", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        discountAmount = pointsToUse
+        updateTotals()
+        Toast.makeText(this, "Discount applied: EGP %.2f".format(discountAmount), Toast.LENGTH_SHORT).show()
+    }
+
     private fun updateTotals() {
         val itemsTotal = cartItems.sumOf { (it.price ?: 0.0) * it.selectedQuantity }
-        val finalTotal = itemsTotal + deliveryFee
+        val finalTotal = max(0.0, itemsTotal + deliveryFee - discountAmount)
 
         txtItemsTotal.text = "Items Total: EGP %.2f".format(itemsTotal)
         txtDeliveryFee.text = "Delivery Fee: EGP %.2f".format(deliveryFee)
+        txtDiscount.text = "Discount: - EGP %.2f".format(discountAmount)
         txtFinalTotal.text = "Total: EGP %.2f".format(finalTotal)
+
+        txtDiscount.visibility = if (discountAmount > 0) View.VISIBLE else View.GONE
     }
 
     private fun fetchStoreLocation() {
@@ -321,7 +405,7 @@ class CheckoutActivity : AppCompatActivity() {
         }
 
         val itemsTotal = cartItems.sumOf { (it.price ?: 0.0) * it.selectedQuantity }
-        val orderTotal = if (radioDelivery.isChecked) itemsTotal + deliveryFee else itemsTotal
+        val orderTotal = max(0.0, itemsTotal + (if (radioDelivery.isChecked) deliveryFee else 0.0) - discountAmount)
 
         val fullOrderData = hashMapOf(
             "customerUid" to currentUserUid,
@@ -335,6 +419,7 @@ class CheckoutActivity : AppCompatActivity() {
             },
             "itemsTotal" to itemsTotal,
             "deliveryFee" to if (radioDelivery.isChecked) deliveryFee else 0.0,
+            "discount" to discountAmount,
             "orderTotal" to orderTotal,
             "pickupMethod" to if (radioShopPickup.isChecked) "shop" else "delivery",
             "deliveryLat" to userLat,
@@ -369,6 +454,14 @@ class CheckoutActivity : AppCompatActivity() {
 
                 customerRef.setValue(true)
                     .addOnSuccessListener {
+                        // Deduct points if used
+                        if (discountAmount > 0) {
+                            val newPoints = availablePoints - discountAmount
+                            database.reference.child("users").child("Customer")
+                                .child(currentUserUid).child("deliveryPoints")
+                                .setValue(newPoints)
+                        }
+
                         Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show()
                         CartManager.clearCart()
                         cartItems.clear()
