@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
 }
 buildscript {
-        repositories {
+    repositories {
         google()
         mavenCentral()
     }
@@ -15,4 +15,3 @@ buildscript {
         classpath("com.google.gms:google-services:4.4.2") // ✅ Add this line
     }
 }
-
