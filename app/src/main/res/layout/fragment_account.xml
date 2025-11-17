@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -84,6 +85,19 @@
                     android:textStyle="bold"
                     android:textColor="#333333"
                     android:fontFamily="sans-serif-medium" />
+
+                <!-- Delivery Points Display -->
+                <TextView
+                    android:id="@+id/txtDeliveryPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery Earnings: EGP 0.00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
 
             <TextView
@@ -115,115 +129,18 @@
                     android:drawableTint="#FFFFFF"
                     android:gravity="center"
                     android:layout_marginBottom="8dp"/>
+
+                <!-- Delivery Volunteer Button -->
+                <Button
+                    android:id="@+id/btnDeliveryVolunteer"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="🚚 Become a Delivery Volunteer"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#4CAF50"
+                    android:textStyle="bold"
+                    android:gravity="center" />
             </LinearLayout>
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Payment Methods"-->
-<!--                android:textSize="18sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textColor="#333333"-->
-<!--                android:layout_marginBottom="12dp"-->
-<!--                android:fontFamily="sans-serif-medium"/>-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical"-->
-<!--                android:background="@drawable/rounded_card"-->
-<!--                android:padding="16dp"-->
-<!--                android:layout_marginBottom="16dp">-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal"-->
-<!--                    android:gravity="center_vertical"-->
-<!--                    android:paddingVertical="12dp">-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="0dp"-->
-<!--                        android:layout_weight="1"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Visa ending in 1234"-->
-<!--                        android:textColor="#333333"-->
-<!--                        android:textSize="16sp"/>-->
-
-<!--                    <Button-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Edit"-->
-<!--                        android:textColor="#28A745"-->
-<!--                        android:background="@android:color/transparent"-->
-<!--                        android:minWidth="60dp"/>-->
-<!--                </LinearLayout>-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/btnAddCard"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="48dp"-->
-<!--                    android:text="Add New Card"-->
-<!--                    android:textColor="#28A745"-->
-<!--                    android:background="@drawable/rounded_input"-->
-<!--                    android:layout_marginTop="8dp"/>-->
-<!--            </LinearLayout>-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Account Settings"-->
-<!--                android:textSize="18sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textColor="#333333"-->
-<!--                android:layout_marginBottom="12dp"-->
-<!--                android:fontFamily="sans-serif-medium"/>-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical"-->
-<!--                android:background="@drawable/rounded_card"-->
-<!--                android:padding="16dp"-->
-<!--                android:layout_marginBottom="16dp">-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/btnChangePassword"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="48dp"-->
-<!--                    android:text="Change Password"-->
-<!--                    android:textColor="#333333"-->
-<!--                    android:background="@android:color/transparent"-->
-<!--                    android:gravity="start|center_vertical"-->
-<!--                    android:paddingStart="16dp"-->
-<!--                    android:paddingEnd="16dp"/>-->
-
-<!--                <View-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="1dp"-->
-<!--                    android:background="#E0E0E0"/>-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/btnNotificationPreferences"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="48dp"-->
-<!--                    android:text="Notification Preferences"-->
-<!--                    android:textColor="#333333"-->
-<!--                    android:background="@android:color/transparent"-->
-<!--                    android:gravity="start|center_vertical"-->
-<!--                    android:paddingStart="16dp"-->
-<!--                    android:paddingEnd="16dp"/>-->
-<!--            </LinearLayout>-->
-
-<!--            <Button-->
-<!--                android:id="@+id/btnLogout"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="56dp"-->
-<!--                android:text="Logout"-->
-<!--                android:textColor="#FFFFFF"-->
-<!--                android:backgroundTint="#DC3545"-->
-<!--                android:textStyle="bold"-->
-<!--                android:layout_marginTop="8dp"/>-->
-      </LinearLayout>-->
+        </LinearLayout>
     </ScrollView>
 </RelativeLayout>

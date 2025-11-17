@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.cravings.R
 import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.delivery.DeliveryShopsActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -20,6 +22,8 @@ class AccountFragment : Fragment() {
     private lateinit var roleTextView: TextView
     private lateinit var profileButton: ImageView
     private lateinit var btnEditProfile: Button
+    private lateinit var btnDeliveryVolunteer: Button
+    private lateinit var txtDeliveryPoints: TextView
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
@@ -37,11 +41,14 @@ class AccountFragment : Fragment() {
         roleTextView = view.findViewById(R.id.roleText)
         profileButton = view.findViewById(R.id.profileButton)
         btnEditProfile = view.findViewById(R.id.btnEditProfile)
+        btnDeliveryVolunteer = view.findViewById(R.id.btnDeliveryVolunteer)
+        txtDeliveryPoints = view.findViewById(R.id.txtDeliveryPoints)
 
         userRole = arguments?.getString("userRole") ?: "Customer"
 
         loadUserName()
         loadProfileImage()
+        loadDeliveryPoints()
 
         profileButton.setOnClickListener {
             startActivity(Intent(requireContext(), ProfileActivity::class.java)
@@ -53,6 +60,10 @@ class AccountFragment : Fragment() {
                 .putExtra("userRole", userRole))
         }
 
+        btnDeliveryVolunteer.setOnClickListener {
+            applyForDelivery()
+        }
+
         return view
     }
 
@@ -60,6 +71,7 @@ class AccountFragment : Fragment() {
         super.onResume()
         loadUserName()
         loadProfileImage()
+        loadDeliveryPoints()
     }
 
     private fun loadUserName() {
@@ -87,6 +99,50 @@ class AccountFragment : Fragment() {
                         .placeholder(R.drawable.ic_profile_placeholder)
                         .circleCrop()
                         .into(imgView)
+                }
+            }
+    }
+
+    private fun loadDeliveryPoints() {
+        val uid = auth.currentUser?.uid ?: return
+        database.reference.child("users").child("Customer").child(uid).child("deliveryPoints")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val points = snapshot.getValue(Double::class.java) ?: 0.0
+                    txtDeliveryPoints.text = "Delivery Earnings: EGP %.2f".format(points)
+                    txtDeliveryPoints.visibility = if (points > 0) View.VISIBLE else View.GONE
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun applyForDelivery() {
+        val uid = auth.currentUser?.uid ?: return
+
+        // Check if already a volunteer
+        database.reference.child("users").child("Customer").child(uid).child("isDeliveryVolunteer")
+            .get().addOnSuccessListener { snapshot ->
+                val isVolunteer = snapshot.getValue(Boolean::class.java) ?: false
+
+                if (isVolunteer) {
+                    // Already a volunteer, go to delivery shops
+                    startActivity(Intent(requireContext(), DeliveryShopsActivity::class.java))
+                } else {
+                    // First time, register as volunteer
+                    database.reference.child("users").child("Customer").child(uid)
+                        .child("isDeliveryVolunteer").setValue(true)
+                        .addOnSuccessListener {
+                            // Initialize delivery points if not exists
+                            database.reference.child("users").child("Customer").child(uid)
+                                .child("deliveryPoints").setValue(0.0)
+
+                            Toast.makeText(requireContext(), "You're now a delivery volunteer!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(requireContext(), DeliveryShopsActivity::class.java))
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "Failed to register: ${it.message}", Toast.LENGTH_SHORT).show()
+                        }
                 }
             }
     }
