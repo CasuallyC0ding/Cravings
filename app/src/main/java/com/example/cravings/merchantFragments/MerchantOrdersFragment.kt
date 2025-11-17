@@ -87,10 +87,12 @@ class MerchantOrdersFragment : Fragment() {
                                 itemsList.add(OrderItem(productId, name, price, quantity))
                             }
 
-                            ordersList.add(OrderData(
-                                customerId, orderId, status, shopName, pickupMethod,
-                                orderTotal, itemsTotal, deliveryFee, timestamp, itemsList
-                            ))
+                            ordersList.add(
+                                OrderData(
+                                    customerId, orderId, status, shopName, pickupMethod,
+                                    orderTotal, itemsTotal, deliveryFee, timestamp, itemsList
+                                )
+                            )
                         } catch (e: Exception) {
                             Log.e("FIREBASE", "Error parsing order $orderId: ${e.message}")
                         }
@@ -129,7 +131,8 @@ class MerchantOrdersFragment : Fragment() {
             database.reference.child("users").child("Customer").child(customerId).child("name")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        customerNamesCache[customerId] = snapshot.getValue(String::class.java) ?: "Unknown Customer"
+                        customerNamesCache[customerId] =
+                            snapshot.getValue(String::class.java) ?: "Unknown Customer"
                         fetchedCount++
                         if (fetchedCount == totalToFetch) callback()
                     }
@@ -153,7 +156,6 @@ class MerchantOrdersFragment : Fragment() {
         val statusText = card.findViewById<TextView>(R.id.orderStatusText)
         statusText?.text = order.status.capitalize(Locale.ROOT)
 
-        // Create status badge with proper colors
         val backgroundColor = when (order.status.lowercase()) {
             "waiting for seller approval", "pending" -> android.R.color.holo_orange_dark
             "preparing", "accepted" -> android.R.color.holo_blue_dark
@@ -182,7 +184,8 @@ class MerchantOrdersFragment : Fragment() {
         }
         card.findViewById<TextView>(R.id.itemsText)?.text = itemsString
         card.findViewById<TextView>(R.id.orderTotalText)?.text = "${String.format("%.2f", order.orderTotal)} EGP"
-        card.findViewById<TextView>(R.id.pickupMethodText)?.text = order.pickupMethod.capitalize(Locale.ROOT)
+        card.findViewById<TextView>(R.id.pickupMethodText)?.text =
+            order.pickupMethod.capitalize(Locale.ROOT)
 
         val acceptBtn = card.findViewById<Button>(R.id.acceptBtn)
         val rejectBtn = card.findViewById<Button>(R.id.rejectBtn)
@@ -192,7 +195,9 @@ class MerchantOrdersFragment : Fragment() {
                 acceptBtn?.isEnabled = true
                 rejectBtn?.isEnabled = true
                 acceptBtn?.setOnClickListener { acceptOrder(order) }
-                rejectBtn?.setOnClickListener { rejectOrder(order.customerId, order.orderId) }
+                rejectBtn?.setOnClickListener {
+                    rejectOrder(order.customerId, order.orderId)
+                }
             }
             "preparing", "accepted", "waiting for delivery", "order ready" -> {
                 acceptBtn?.text = order.status.uppercase()
@@ -234,18 +239,24 @@ class MerchantOrdersFragment : Fragment() {
             }
     }
 
+    // -------------------------------------------------------------
+    // 🔥🔥🔥 THIS IS THE ONLY PART THAT WAS MODIFIED (acceptOrder) 🔥🔥🔥
+    // -------------------------------------------------------------
     private fun acceptOrder(order: OrderData) {
         val merchantId = auth.currentUser?.uid ?: return
         val productsRef = database.reference.child("users").child(userRole).child(merchantId).child("products")
 
         productsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+
                 val insufficientStock = mutableListOf<String>()
 
                 order.items.forEach { item ->
                     val productNode = snapshot.child(item.productId.toString())
-                    val stock = productNode.child("stock").getValue(Int::class.java) ?: 0
-                    val productName = productNode.child("name").getValue(String::class.java) ?: "Product ${item.productId}"
+                    val stock = productNode.child("stock")
+                        .getValue(Int::class.java) ?: 0
+                    val productName = productNode.child("name")
+                        .getValue(String::class.java) ?: "Product ${item.productId}"
 
                     if (stock < item.quantity) {
                         insufficientStock.add("$productName (need ${item.quantity}, have $stock)")
@@ -253,30 +264,66 @@ class MerchantOrdersFragment : Fragment() {
                 }
 
                 if (insufficientStock.isNotEmpty()) {
-                    Toast.makeText(requireContext(), "Insufficient stock:\n${insufficientStock.joinToString("\n")}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Insufficient stock:\n${insufficientStock.joinToString("\n")}",
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
                 }
 
+                // Deduct stock
                 order.items.forEach { item ->
-                    val currentStock = snapshot.child(item.productId.toString()).child("stock").getValue(Int::class.java) ?: 0
+                    val currentStock = snapshot.child(item.productId.toString())
+                        .child("stock").getValue(Int::class.java) ?: 0
                     val newStock = currentStock - item.quantity
-                    productsRef.child(item.productId.toString()).child("stock").setValue(newStock)
+                    productsRef.child(item.productId.toString())
+                        .child("stock").setValue(newStock)
                 }
 
-                val newStatus = if (order.pickupMethod == "delivery") "Waiting for Delivery" else "Order Ready"
-                database.reference.child("users").child(userRole)
-                    .child(merchantId).child("orders")
-                    .child(order.customerId).child(order.orderId).child("status")
-                    .setValue(newStatus)
-                    .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Order Accepted - Stock Updated", Toast.LENGTH_SHORT).show()
-                    }
+                // 🔥 SHOW DELIVERY SELECTION DIALOG AFTER STOCK IS UPDATED
+                val dialog = android.app.AlertDialog.Builder(requireContext())
+                dialog.setTitle("Choose Delivery Method")
+                dialog.setMessage("How do you want to deliver this order?")
+
+                dialog.setPositiveButton("Shop Delivery") { _, _ ->
+                    updateOrderStatus(order, "out for delivery")
+                }
+
+                dialog.setNegativeButton("Freelancer Delivery") { _, _ ->
+                    updateOrderStatus(order, "Waiting for Delivery")
+                }
+
+                dialog.setNeutralButton("Cancel", null)
+                if (order.pickupMethod!="shop") {
+
+                    dialog.show()
+                }
+                else{
+                    updateOrderStatus(order, "order ready")
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(requireContext(), "Failed to check stock", Toast.LENGTH_LONG).show()
             }
         })
+    }
+
+    private fun updateOrderStatus(order: OrderData, newStatus: String) {
+        val merchantId = auth.currentUser?.uid ?: return
+
+        database.reference.child("users").child(userRole)
+            .child(merchantId).child("orders")
+            .child(order.customerId).child(order.orderId)
+            .child("status").setValue(newStatus)
+            .addOnSuccessListener {
+                Toast.makeText(
+                    requireContext(),
+                    "Order updated: $newStatus",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     private fun addEmpty(text: String) {
@@ -289,11 +336,22 @@ class MerchantOrdersFragment : Fragment() {
     }
 
     data class OrderData(
-        val customerId: String, val orderId: String, val status: String,
-        val shopName: String, val pickupMethod: String, val orderTotal: Double,
-        val itemsTotal: Double, val deliveryFee: Double, val timestamp: Long,
+        val customerId: String,
+        val orderId: String,
+        val status: String,
+        val shopName: String,
+        val pickupMethod: String,
+        val orderTotal: Double,
+        val itemsTotal: Double,
+        val deliveryFee: Double,
+        val timestamp: Long,
         val items: List<OrderItem>
     )
 
-    data class OrderItem(val productId: Int, val name: String, val price: Double, val quantity: Int)
+    data class OrderItem(
+        val productId: Int,
+        val name: String,
+        val price: Double,
+        val quantity: Int
+    )
 }
