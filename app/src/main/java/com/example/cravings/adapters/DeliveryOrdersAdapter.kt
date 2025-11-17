@@ -1,10 +1,13 @@
 package com.example.cravings.adapters
 
+import android.content.Intent
+import android.net.Uri
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -25,6 +28,7 @@ class DeliveryOrdersAdapter(
         val orderTotalText: TextView = itemView.findViewById(R.id.orderTotalText)
         val deliveryFeeText: TextView = itemView.findViewById(R.id.deliveryFeeText)
         val btnApply: Button = itemView.findViewById(R.id.btnApply)
+        val btnViewLocation: ImageButton = itemView.findViewById(R.id.btnViewLocation)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
@@ -36,52 +40,78 @@ class DeliveryOrdersAdapter(
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = ordersList[position]
 
+        // ORDER ID
         holder.orderIdText.text = "Order #${order.orderId?.take(8)}"
 
-        // Set status with badge
+        // STATUS BADGE
         val statusText = order.status ?: "Waiting"
-        holder.statusText.text = statusText.capitalize()
+        holder.statusText.text = statusText.replaceFirstChar { it.uppercase() }
 
-        val backgroundColor = when (statusText.lowercase()) {
+        val badgeColor = when (statusText.lowercase()) {
             "waiting for delivery" -> android.R.color.holo_orange_dark
             "out for delivery" -> android.R.color.holo_blue_dark
             else -> android.R.color.darker_gray
         }
 
-        val drawable = GradientDrawable()
-        drawable.shape = GradientDrawable.RECTANGLE
-        drawable.cornerRadius = 20f
-        drawable.setColor(ContextCompat.getColor(holder.itemView.context, backgroundColor))
-        holder.statusText.background = drawable
+        val badgeBackground = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 20f
+            setColor(ContextCompat.getColor(holder.itemView.context, badgeColor))
+        }
+
+        holder.statusText.background = badgeBackground
         holder.statusText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.white))
 
+        // TOTALS
         holder.orderTotalText.text = "EGP %.2f".format(order.orderTotal ?: 0.0)
         holder.deliveryFeeText.text = "Delivery Fee: EGP %.2f".format(order.deliveryFee ?: 0.0)
 
+        // LOCATION TEXT
         if (order.deliveryLat != null && order.deliveryLng != null) {
-            holder.customerLocationText.text = "📍 Lat: %.4f, Lng: %.4f".format(order.deliveryLat, order.deliveryLng)
+            holder.customerLocationText.text =
+                "📍 Lat: %.4f, Lng: %.4f".format(order.deliveryLat, order.deliveryLng)
         } else {
             holder.customerLocationText.text = "📍 Location not available"
         }
 
+        // ITEMS
         holder.itemsContainer.removeAllViews()
         order.items?.forEach { item ->
             val itemView = LayoutInflater.from(holder.itemsContainer.context)
                 .inflate(R.layout.item_order_product, holder.itemsContainer, false)
 
-            val txtName = itemView.findViewById<TextView>(R.id.txtProductName)
-            val txtQuantity = itemView.findViewById<TextView>(R.id.txtProductQuantity)
-            val txtPrice = itemView.findViewById<TextView>(R.id.txtProductPrice)
-
-            txtName.text = item.name
-            txtQuantity.text = "${item.quantity}"
-            txtPrice.text = "EGP %.2f".format(item.price ?: 0.0)
+            itemView.findViewById<TextView>(R.id.txtProductName).text = item.name
+            itemView.findViewById<TextView>(R.id.txtProductQuantity).text = "${item.quantity}"
+            itemView.findViewById<TextView>(R.id.txtProductPrice).text =
+                "EGP %.2f".format(item.price ?: 0.0)
 
             holder.itemsContainer.addView(itemView)
         }
 
+        // APPLY BUTTON
         holder.btnApply.setOnClickListener {
             onApplyClick(order)
+        }
+
+        // VIEW LOCATION BUTTON → OPEN GOOGLE MAPS
+        holder.btnViewLocation.setOnClickListener {
+            val lat = order.deliveryLat
+            val lng = order.deliveryLng
+
+            if (lat != null && lng != null) {
+                val uri = Uri.parse("geo:$lat,$lng?q=$lat,$lng(Customer Location)")
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                intent.setPackage("com.google.android.apps.maps")
+
+                try {
+                    holder.itemView.context.startActivity(intent)
+                } catch (e: Exception) {
+                    // Google Maps not installed → open browser
+                    val browserIntent =
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://maps.google.com/?q=$lat,$lng"))
+                    holder.itemView.context.startActivity(browserIntent)
+                }
+            }
         }
     }
 
