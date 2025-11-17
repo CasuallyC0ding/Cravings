@@ -1,11 +1,13 @@
 package com.example.cravings.delivery
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -133,7 +135,8 @@ class DeliveryOrdersActivity : AppCompatActivity() {
     private fun applyForDelivery(order: Order) {
         val deliveryDriverId = auth.currentUser?.uid ?: return
 
-        // Add delivery driver info to the order
+        Log.d("DELIVERY", "Applying for delivery - Order: ${order.orderId}, Driver: $deliveryDriverId")
+
         val orderRef = database.reference
             .child("users")
             .child("Merchant")
@@ -143,16 +146,19 @@ class DeliveryOrdersActivity : AppCompatActivity() {
             .child(order.orderId ?: "")
 
         val updates = hashMapOf<String, Any>(
-            "deliveryDriverId" to deliveryDriverId,
-            "deliveryApplicationStatus" to "Pending Merchant Approval"
+            "status" to "Out for Delivery",
+            "deliveryDriverId" to deliveryDriverId
         )
 
         orderRef.updateChildren(updates)
             .addOnSuccessListener {
-                android.widget.Toast.makeText(this, "Application sent! Waiting for merchant approval", android.widget.Toast.LENGTH_SHORT).show()
+                Log.d("DELIVERY", "Status updated to Out for Delivery")
+                Toast.makeText(this, "✅ You're now delivering this order!", Toast.LENGTH_SHORT).show()
+                finish()
             }
-            .addOnFailureListener {
-                android.widget.Toast.makeText(this, "Failed to apply: ${it.message}", android.widget.Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Log.e("DELIVERY", "Failed to update status: ${e.message}")
+                Toast.makeText(this, "Failed to apply: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

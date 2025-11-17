@@ -1,5 +1,6 @@
 package com.example.cravings.merchantFragments
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
@@ -26,8 +28,6 @@ class MerchantOrdersFragment : Fragment() {
 
     private val userRole = "Merchant"
     private val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-
-    // Cache customer names to avoid multiple fetches
     private val customerNamesCache = mutableMapOf<String, String>()
 
     override fun onCreateView(
@@ -46,34 +46,26 @@ class MerchantOrdersFragment : Fragment() {
             Toast.makeText(requireContext(), "Authentication error", Toast.LENGTH_SHORT).show()
             return
         }
-        Log.d("FIREBASE", "Current merchantId: $merchantId")
 
         val ordersRef = database.reference
             .child("users").child(userRole).child(merchantId).child("orders")
-        Log.d("FIREBASE", "Reading orders from path: ${ordersRef.path}")
 
         ordersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 ordersContainer.removeAllViews()
 
                 if (!snapshot.exists()) {
-                    Log.d("FIREBASE", "No orders found at this path")
                     addEmpty("No orders yet")
                     return
                 }
 
-                Log.d("FIREBASE", "Orders snapshot exists with ${snapshot.childrenCount} customers")
-
                 val ordersList = mutableListOf<OrderData>()
                 val customerIds = mutableSetOf<String>()
 
-                // Iterate through each customer
                 snapshot.children.forEach { customerNode ->
                     val customerId = customerNode.key ?: return@forEach
                     customerIds.add(customerId)
-                    Log.d("FIREBASE", "Processing customerId: $customerId")
 
-                    // Iterate through each order for this customer
                     customerNode.children.forEach { orderNode ->
                         val orderId = orderNode.key ?: return@forEach
 
@@ -86,63 +78,38 @@ class MerchantOrdersFragment : Fragment() {
                             val deliveryFee = orderNode.child("deliveryFee").getValue(Double::class.java) ?: 0.0
                             val timestamp = orderNode.child("timestamp").getValue(Long::class.java) ?: 0L
 
-                            // Parse items
                             val itemsList = mutableListOf<OrderItem>()
                             orderNode.child("items").children.forEach { itemNode ->
                                 val name = itemNode.child("name").value?.toString() ?: "Unknown"
                                 val price = itemNode.child("price").getValue(Double::class.java) ?: 0.0
                                 val quantity = itemNode.child("quantity").getValue(Int::class.java) ?: 1
                                 val productId = itemNode.child("productId").getValue(Int::class.java) ?: 0
-
                                 itemsList.add(OrderItem(productId, name, price, quantity))
                             }
 
-                            val orderData = OrderData(
-                                customerId = customerId,
-                                orderId = orderId,
-                                status = status,
-                                shopName = shopName,
-                                pickupMethod = pickupMethod,
-                                orderTotal = orderTotal,
-                                itemsTotal = itemsTotal,
-                                deliveryFee = deliveryFee,
-                                timestamp = timestamp,
-                                items = itemsList
-                            )
-
-                            ordersList.add(orderData)
-                            Log.d("FIREBASE", "Order parsed successfully: $orderId")
-
+                            ordersList.add(OrderData(
+                                customerId, orderId, status, shopName, pickupMethod,
+                                orderTotal, itemsTotal, deliveryFee, timestamp, itemsList
+                            ))
                         } catch (e: Exception) {
                             Log.e("FIREBASE", "Error parsing order $orderId: ${e.message}")
                         }
                     }
                 }
 
-                // Sort orders by timestamp (newest first)
                 ordersList.sortByDescending { it.timestamp }
 
                 if (ordersList.isEmpty()) {
-                    Log.d("FIREBASE", "No valid orders found")
                     addEmpty("No orders yet")
                 } else {
-                    Log.d("FIREBASE", "Displaying ${ordersList.size} orders")
-                    // Fetch all customer names at once, then display orders
                     fetchAllCustomerNames(customerIds.toList()) {
-                        ordersList.forEach { order ->
-                            addOrderCard(order)
-                        }
+                        ordersList.forEach { order -> addOrderCard(order) }
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("FIREBASE", "Failed to read orders: ${error.message}")
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to load orders: ${error.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(requireContext(), "Failed to load orders", Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -150,42 +117,27 @@ class MerchantOrdersFragment : Fragment() {
     private fun fetchAllCustomerNames(customerIds: List<String>, callback: () -> Unit) {
         var fetchedCount = 0
         val totalToFetch = customerIds.size
-
-        if (totalToFetch == 0) {
-            callback()
-            return
-        }
+        if (totalToFetch == 0) { callback(); return }
 
         customerIds.forEach { customerId ->
-            // Check cache first
             if (customerNamesCache.containsKey(customerId)) {
                 fetchedCount++
-                if (fetchedCount == totalToFetch) {
-                    callback()
-                }
+                if (fetchedCount == totalToFetch) callback()
                 return@forEach
             }
 
-            // Fetch from database
-            database.reference
-                .child("users").child("Customer").child(customerId).child("name")
+            database.reference.child("users").child("Customer").child(customerId).child("name")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val name = snapshot.getValue(String::class.java) ?: "Unknown Customer"
-                        customerNamesCache[customerId] = name
+                        customerNamesCache[customerId] = snapshot.getValue(String::class.java) ?: "Unknown Customer"
                         fetchedCount++
-                        if (fetchedCount == totalToFetch) {
-                            callback()
-                        }
+                        if (fetchedCount == totalToFetch) callback()
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Log.e("FIREBASE", "Failed to fetch customer name: ${error.message}")
                         customerNamesCache[customerId] = "Customer"
                         fetchedCount++
-                        if (fetchedCount == totalToFetch) {
-                            callback()
-                        }
+                        if (fetchedCount == totalToFetch) callback()
                     }
                 })
         }
@@ -194,140 +146,100 @@ class MerchantOrdersFragment : Fragment() {
     private fun addOrderCard(order: OrderData) {
         val card = layoutInflater.inflate(R.layout.item_order_card, ordersContainer, false)
 
-        // Get customer name from cache
         val customerName = customerNamesCache[order.customerId] ?: "Unknown Customer"
         card.findViewById<TextView>(R.id.customerIdText)?.text = "Customer: $customerName"
-
         card.findViewById<TextView>(R.id.orderIdText)?.text = "Order #${order.orderId.takeLast(8)}"
-        card.findViewById<TextView>(R.id.orderStatusText)?.text = order.status.capitalize(Locale.ROOT)
 
-        // Format timestamp
+        val statusText = card.findViewById<TextView>(R.id.orderStatusText)
+        statusText?.text = order.status.capitalize(Locale.ROOT)
+
+        // Create status badge with proper colors
+        val backgroundColor = when (order.status.lowercase()) {
+            "waiting for seller approval", "pending" -> android.R.color.holo_orange_dark
+            "preparing", "accepted" -> android.R.color.holo_blue_dark
+            "rejected", "cancelled" -> android.R.color.holo_red_dark
+            "waiting for delivery" -> android.R.color.holo_orange_light
+            "order ready" -> android.R.color.holo_green_light
+            "out for delivery" -> android.R.color.holo_blue_light
+            "delivered", "completed" -> android.R.color.holo_green_dark
+            else -> android.R.color.darker_gray
+        }
+
+        val drawable = GradientDrawable()
+        drawable.shape = GradientDrawable.RECTANGLE
+        drawable.cornerRadius = 20f
+        drawable.setColor(ContextCompat.getColor(requireContext(), backgroundColor))
+        statusText?.background = drawable
+        statusText?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+
         val timeText = if (order.timestamp > 0) {
             dateFormat.format(Date(order.timestamp))
-        } else {
-            "Unknown time"
-        }
+        } else "Unknown time"
         card.findViewById<TextView>(R.id.orderTimeText)?.text = timeText
 
-        // Display items
         val itemsString = order.items.joinToString("\n") { item ->
             "• ${item.name} x${item.quantity} - ${String.format("%.2f", item.price * item.quantity)} EGP"
         }
         card.findViewById<TextView>(R.id.itemsText)?.text = itemsString
+        card.findViewById<TextView>(R.id.orderTotalText)?.text = "${String.format("%.2f", order.orderTotal)} EGP"
+        card.findViewById<TextView>(R.id.pickupMethodText)?.text = order.pickupMethod.capitalize(Locale.ROOT)
 
-        // Display total
-        card.findViewById<TextView>(R.id.orderTotalText)?.text =
-            "${String.format("%.2f", order.orderTotal)} EGP"
-
-        // Display pickup method
-        card.findViewById<TextView>(R.id.pickupMethodText)?.text =
-            order.pickupMethod.capitalize(Locale.ROOT)
-
-        // Update status text color based on status
-        val statusText = card.findViewById<TextView>(R.id.orderStatusText)
-        when (order.status.lowercase()) {
-            "waiting for seller approval", "pending" -> {
-                statusText?.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
-            }
-            "preparing", "accepted" -> {
-                statusText?.setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
-            }
-            "rejected", "cancelled" -> {
-                statusText?.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-            }
-            else -> {
-                statusText?.setTextColor(resources.getColor(android.R.color.darker_gray, null))
-            }
-        }
-
-        // Setup buttons BEFORE adding to container
         val acceptBtn = card.findViewById<Button>(R.id.acceptBtn)
         val rejectBtn = card.findViewById<Button>(R.id.rejectBtn)
 
-        if (acceptBtn == null || rejectBtn == null) {
-            Log.e("FIREBASE", "Buttons not found in card!")
-        } else {
-            Log.d("FIREBASE", "Setting up buttons for order ${order.orderId} with status ${order.status}")
-
-            when (order.status.lowercase()) {
-                "waiting for seller approval", "pending" -> {
-                    acceptBtn.isEnabled = true
-                    rejectBtn.isEnabled = true
-                    acceptBtn.isClickable = true
-                    rejectBtn.isClickable = true
-
-                    // Set click listeners with proper logging
-                    acceptBtn.setOnClickListener {
-                        Log.d("FIREBASE", "Accept button clicked for order ${order.orderId}")
-                        acceptOrder(order)
-                    }
-
-                    rejectBtn.setOnClickListener {
-                        Log.d("FIREBASE", "Reject button clicked for order ${order.orderId}")
-                        rejectOrder(order.customerId, order.orderId)
-                    }
-
-                    Log.d("FIREBASE", "Buttons enabled and click listeners set")
-                }
-                "preparing", "accepted" -> {
-                    acceptBtn.text = "PREPARING"
-                    acceptBtn.isEnabled = false
-                    acceptBtn.alpha = 0.6f
-                    rejectBtn.visibility = View.GONE
-                }
-                "rejected", "cancelled" -> {
-                    acceptBtn.visibility = View.GONE
-                    rejectBtn.text = "REJECTED"
-                    rejectBtn.isEnabled = false
-                    rejectBtn.alpha = 0.6f
-                }
-                else -> {
-                    acceptBtn.isEnabled = false
-                    acceptBtn.alpha = 0.6f
-                    rejectBtn.isEnabled = false
-                    rejectBtn.alpha = 0.6f
-                }
+        when (order.status.lowercase()) {
+            "waiting for seller approval", "pending" -> {
+                acceptBtn?.isEnabled = true
+                rejectBtn?.isEnabled = true
+                acceptBtn?.setOnClickListener { acceptOrder(order) }
+                rejectBtn?.setOnClickListener { rejectOrder(order.customerId, order.orderId) }
+            }
+            "preparing", "accepted", "waiting for delivery", "order ready" -> {
+                acceptBtn?.text = order.status.uppercase()
+                acceptBtn?.isEnabled = false
+                acceptBtn?.alpha = 0.6f
+                rejectBtn?.visibility = View.GONE
+            }
+            "out for delivery" -> {
+                acceptBtn?.text = "OUT FOR DELIVERY"
+                acceptBtn?.isEnabled = false
+                acceptBtn?.alpha = 0.6f
+                rejectBtn?.visibility = View.GONE
+            }
+            "delivered", "completed" -> {
+                acceptBtn?.text = "COMPLETED"
+                acceptBtn?.isEnabled = false
+                acceptBtn?.alpha = 0.6f
+                rejectBtn?.visibility = View.GONE
+            }
+            "rejected", "cancelled" -> {
+                acceptBtn?.visibility = View.GONE
+                rejectBtn?.text = "REJECTED"
+                rejectBtn?.isEnabled = false
+                rejectBtn?.alpha = 0.6f
             }
         }
 
-        // Add card to container LAST
         ordersContainer.addView(card)
     }
 
     private fun rejectOrder(customerId: String, orderId: String) {
         val merchantId = auth.currentUser?.uid ?: return
-
-        Log.d("FIREBASE", "Rejecting order: $orderId for customer: $customerId")
-
         database.reference.child("users").child(userRole)
             .child(merchantId).child("orders")
             .child(customerId).child(orderId).child("status")
             .setValue("rejected")
             .addOnSuccessListener {
-                Log.d("FIREBASE", "Order rejected successfully")
                 Toast.makeText(requireContext(), "Order Rejected", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Log.e("FIREBASE", "Failed to reject order: ${e.message}")
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to reject order: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
             }
     }
 
     private fun acceptOrder(order: OrderData) {
         val merchantId = auth.currentUser?.uid ?: return
-
-        Log.d("FIREBASE", "Accepting order: ${order.orderId}")
-
-        val productsRef = database.reference
-            .child("users").child(userRole).child(merchantId).child("products")
+        val productsRef = database.reference.child("users").child(userRole).child(merchantId).child("products")
 
         productsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // Validate stock for all items
                 val insufficientStock = mutableListOf<String>()
 
                 order.items.forEach { item ->
@@ -335,95 +247,34 @@ class MerchantOrdersFragment : Fragment() {
                     val stock = productNode.child("stock").getValue(Int::class.java) ?: 0
                     val productName = productNode.child("name").getValue(String::class.java) ?: "Product ${item.productId}"
 
-                    Log.d("FIREBASE", "Checking stock for ${item.name}: need ${item.quantity}, have $stock")
-
                     if (stock < item.quantity) {
                         insufficientStock.add("$productName (need ${item.quantity}, have $stock)")
                     }
                 }
 
                 if (insufficientStock.isNotEmpty()) {
-                    Log.d("FIREBASE", "Insufficient stock detected")
-                    Toast.makeText(
-                        requireContext(),
-                        "Insufficient stock:\n${insufficientStock.joinToString("\n")}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(requireContext(), "Insufficient stock:\n${insufficientStock.joinToString("\n")}", Toast.LENGTH_LONG).show()
                     return
                 }
 
-                Log.d("FIREBASE", "Stock validated, proceeding with deduction")
-
-                // All items have sufficient stock - proceed with deduction
                 order.items.forEach { item ->
-                    val productNode = snapshot.child(item.productId.toString())
-                    val currentStock = productNode.child("stock").getValue(Int::class.java) ?: 0
+                    val currentStock = snapshot.child(item.productId.toString()).child("stock").getValue(Int::class.java) ?: 0
                     val newStock = currentStock - item.quantity
-
-                    Log.d("FIREBASE", "Updating stock for product ${item.productId}: $currentStock -> $newStock")
-
-                    productsRef.child(item.productId.toString())
-                        .child("stock")
-                        .setValue(newStock)
-                        .addOnSuccessListener {
-                            Log.d("FIREBASE", "Stock updated for product ${item.productId}")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("FIREBASE", "Failed to update stock for product ${item.productId}: ${e.message}")
-                        }
+                    productsRef.child(item.productId.toString()).child("stock").setValue(newStock)
                 }
-                var text1=""
-                val ref = database.reference
-                    .child("users")
-                    .child(userRole)
-                    .child(merchantId)
-                    .child("orders")
-                    .child(order.customerId)
-                    .child(order.orderId)
-                    .child("pickupMethod")
 
-                ref.get().addOnSuccessListener { snapshot ->
-                    val method = snapshot.getValue(String::class.java)
-
-                    text1 = if (method == "delivery") {
-                        "Waiting for Delivery"
-                    } else {
-                        "Order Ready"
+                val newStatus = if (order.pickupMethod == "delivery") "Waiting for Delivery" else "Order Ready"
+                database.reference.child("users").child(userRole)
+                    .child(merchantId).child("orders")
+                    .child(order.customerId).child(order.orderId).child("status")
+                    .setValue(newStatus)
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Order Accepted - Stock Updated", Toast.LENGTH_SHORT).show()
                     }
-
-                    database.reference.child("users").child(userRole)
-                        .child(merchantId).child("orders")
-                        .child(order.customerId).child(order.orderId).child("status")
-                        .setValue(text1)
-                        .addOnSuccessListener {
-                            Log.d("FIREBASE", "Order status updated to preparing")
-                            Toast.makeText(
-                                requireContext(),
-                                "Order Accepted - Stock Updated",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("FIREBASE", "Failed to update order status: ${e.message}")
-                            Toast.makeText(
-                                requireContext(),
-                                "Failed to accept order: ${e.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                }
-
-                // Update order status
-
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("FIREBASE", "Failed to check stock: ${error.message}")
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to check stock: ${error.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(requireContext(), "Failed to check stock", Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -437,24 +288,12 @@ class MerchantOrdersFragment : Fragment() {
         ordersContainer.addView(tv)
     }
 
-    // Data classes
     data class OrderData(
-        val customerId: String,
-        val orderId: String,
-        val status: String,
-        val shopName: String,
-        val pickupMethod: String,
-        val orderTotal: Double,
-        val itemsTotal: Double,
-        val deliveryFee: Double,
-        val timestamp: Long,
+        val customerId: String, val orderId: String, val status: String,
+        val shopName: String, val pickupMethod: String, val orderTotal: Double,
+        val itemsTotal: Double, val deliveryFee: Double, val timestamp: Long,
         val items: List<OrderItem>
     )
 
-    data class OrderItem(
-        val productId: Int,
-        val name: String,
-        val price: Double,
-        val quantity: Int
-    )
+    data class OrderItem(val productId: Int, val name: String, val price: Double, val quantity: Int)
 }
