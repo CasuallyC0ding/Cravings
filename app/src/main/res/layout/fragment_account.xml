@@ -140,6 +140,18 @@
                     android:backgroundTint="#4CAF50"
                     android:textStyle="bold"
                     android:gravity="center" />
+
+                <Button
+                    android:id="@+id/btnvoip"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="voip"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#4CAF50"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

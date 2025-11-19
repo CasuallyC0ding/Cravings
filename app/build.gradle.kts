@@ -1,3 +1,6 @@
+// ======================================================
+// In your build.gradle (Module: app) - REPLACE the entire dependencies block with this:
+// ======================================================
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -75,7 +78,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity)
-    implementation ("org.osmdroid:osmdroid-android:6.1.14")
+    implementation("org.osmdroid:osmdroid-android:6.1.14")
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
@@ -87,4 +90,19 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // ======================================================
+    // WebRTC - Use this WORKING version
+    // ======================================================
+
+    // Kotlin Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // JSON
+    implementation("org.json:json:20231013")
+
+    // AppCompat (already have it but good to ensure)
+    implementation("androidx.appcompat:appcompat:1.6.1")
 }
+

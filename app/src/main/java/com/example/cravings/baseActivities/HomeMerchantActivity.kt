@@ -59,6 +59,11 @@ class HomeMerchantActivity : AppCompatActivity() {
                     tab.text = "Orders"
                     tab.setIcon(R.drawable.ic_orders)
                 }
+                2 ->{
+                    tab.text="VOIP"
+                    tab.setIcon(R.drawable.ic_add)
+
+                }
             }
         }.attach()
     }

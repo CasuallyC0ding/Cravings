@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.cravings.R
 import com.example.cravings.baseActivities.ProfileActivity
+import com.example.cravings.baseActivities.VoipActivity
 import com.example.cravings.delivery.DeliveryShopsActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -27,6 +28,7 @@ class AccountFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userRole = "Customer"
+    private lateinit var voip: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +45,7 @@ class AccountFragment : Fragment() {
         btnEditProfile = view.findViewById(R.id.btnEditProfile)
         btnDeliveryVolunteer = view.findViewById(R.id.btnDeliveryVolunteer)
         txtDeliveryPoints = view.findViewById(R.id.txtDeliveryPoints)
-
+        voip=view.findViewById(R.id.btnvoip)
         userRole = arguments?.getString("userRole") ?: "Customer"
 
         loadUserName()
@@ -62,6 +64,11 @@ class AccountFragment : Fragment() {
 
         btnDeliveryVolunteer.setOnClickListener {
             applyForDelivery()
+        }
+        voip.setOnClickListener {
+            startActivity(Intent(requireContext(), VoipActivity::class.java)
+                .putExtra("userRole", userRole))
+
         }
 
         return view

@@ -1,5 +1,10 @@
 package com.example.cravings.customerFragments
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.annotation.RequiresPermission
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +35,12 @@ class OrdersFragment : Fragment() {
     private lateinit var adapter: OrdersAdapter
     private val ordersList = mutableListOf<Order>()
 
+    // Track last status for notifications
+    private val lastStatusMap = mutableMapOf<String, String>()
+
     private val orderListeners = mutableMapOf<String, ValueEventListener>()
+
+    private val CHANNEL_ID = "order_status_channel"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +60,7 @@ class OrdersFragment : Fragment() {
         adapter = OrdersAdapter(ordersList)
         ordersRecyclerView.adapter = adapter
 
+        createNotificationChannel()
         fetchCustomerOrdersRealtime()
 
         return view
@@ -61,7 +75,6 @@ class OrdersFragment : Fragment() {
 
         val customerOrdersRef = database.reference.child("users/Customer/$uid/orders")
 
-        // Listen to customer's order references
         customerOrdersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists() || !snapshot.hasChildren()) {
@@ -69,11 +82,9 @@ class OrdersFragment : Fragment() {
                     return
                 }
 
-                // Clear existing listeners
                 removeAllOrderListeners()
                 ordersList.clear()
 
-                // Set up listeners for each merchant's orders
                 for (shopSnap in snapshot.children) {
                     val shopUid = shopSnap.key ?: continue
                     for (orderSnap in shopSnap.children) {
@@ -95,9 +106,9 @@ class OrdersFragment : Fragment() {
             .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
 
         val listener = object : ValueEventListener {
+            @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    // Order was deleted
                     removeOrderFromList(orderId)
                     return
                 }
@@ -113,6 +124,8 @@ class OrdersFragment : Fragment() {
                     )
                 }
 
+                val status = snapshot.child("status").getValue(String::class.java)
+
                 val order = Order(
                     orderId = orderId,
                     shopUid = shopUid,
@@ -124,13 +137,20 @@ class OrdersFragment : Fragment() {
                     pickupMethod = snapshot.child("pickupMethod").getValue(String::class.java),
                     deliveryLat = snapshot.child("deliveryLat").getValue(Double::class.java),
                     deliveryLng = snapshot.child("deliveryLng").getValue(Double::class.java),
-                    status = snapshot.child("status").getValue(String::class.java),
+                    status = status,
                     timestamp = snapshot.child("timestamp").getValue(Long::class.java),
                     shopName = snapshot.child("shopName").getValue(String::class.java)
                 )
 
+                // Send notification if status changed
+                val key = "${shopUid}_$orderId"
+                val lastStatus = lastStatusMap[key]
+                if (lastStatus != null && lastStatus != status) {
+                    sendStatusNotification(order)
+                }
+                lastStatusMap[key] = status ?: ""
+
                 updateOrderInList(order)
-                Log.d("OrdersFragment", "Order updated: ${order.orderId} - ${order.shopName}")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -146,14 +166,11 @@ class OrdersFragment : Fragment() {
         val existingIndex = ordersList.indexOfFirst { it.orderId == order.orderId }
 
         if (existingIndex != -1) {
-            // Update existing order
             ordersList[existingIndex] = order
         } else {
-            // Add new order
             ordersList.add(order)
         }
 
-        // Sort by timestamp (newest first)
         ordersList.sortByDescending { it.timestamp }
 
         progressBar.visibility = View.GONE
@@ -165,12 +182,7 @@ class OrdersFragment : Fragment() {
     private fun removeOrderFromList(orderId: String) {
         val removed = ordersList.removeAll { it.orderId == orderId }
         if (removed) {
-            Log.d("OrdersFragment", "Order removed: $orderId")
-            if (ordersList.isEmpty()) {
-                showEmptyState()
-            } else {
-                adapter.notifyDataSetChanged()
-            }
+            if (ordersList.isEmpty()) showEmptyState() else adapter.notifyDataSetChanged()
         }
     }
 
@@ -195,19 +207,35 @@ class OrdersFragment : Fragment() {
         ordersRecyclerView.visibility = View.GONE
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    private fun sendStatusNotification(order: Order) {
+        val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Order Status Updated")
+            .setContentText("Order #${order.orderId?.take(8)} is now '${order.status}'")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        NotificationManagerCompat.from(requireContext()).notify(order.orderId.hashCode(), builder.build())
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Order Status"
+            val descriptionText = "Notifications for order status changes"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         removeAllOrderListeners()
-
-        // Also remove the customer orders listener
-        val uid = auth.currentUser?.uid
-        if (uid != null) {
-            database.reference.child("users/Customer/$uid/orders")
-                .removeEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {}
-                    override fun onCancelled(error: DatabaseError) {}
-                })
-        }
     }
 
     companion object {
