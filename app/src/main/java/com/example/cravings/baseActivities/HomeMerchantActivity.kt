@@ -59,10 +59,9 @@ class HomeMerchantActivity : AppCompatActivity() {
                     tab.text = "Orders"
                     tab.setIcon(R.drawable.ic_orders)
                 }
-                2 ->{
-                    tab.text="VOIP"
+                2 -> {
+                    tab.text = "VOIP"
                     tab.setIcon(R.drawable.ic_call)
-
                 }
             }
         }.attach()
@@ -104,5 +103,21 @@ class HomeMerchantActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
+
+    // --- Handle notification click when Activity is already running ---
+    // This method is called when HomeMerchantActivity is already open
+    // (in background or foreground) and a new Intent is delivered to it.
+    // We send an extra "open_orders = true" from the notification.
+    // If the user taps the notification, this block switches the ViewPager
+    // to the Orders tab (index 1) without recreating the Activity.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        if (intent.getBooleanExtra("open_orders", false)) {
+            viewPager.post {
+                viewPager.currentItem = 1
+            }
+        }
     }
 }

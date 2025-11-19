@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
@@ -21,81 +21,62 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cravings"
         tools:targetApi="31">
-        <activity
-            android:name=".baseActivities.VoipActivity"
-            android:exported="false" />
-        <activity
-            android:name=".delivery.DeliveryOrdersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".delivery.DeliveryShopsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".baseActivities.CheckoutActivity"
-            android:exported="false" />
 
+        <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY_HERE" />
 
-        <activity
-            android:name=".baseActivities.MapPickerActivity"
+        <!-- Activities -->
+        <activity android:name=".baseActivities.VoipActivity" android:exported="false" />
+        <activity android:name=".delivery.DeliveryOrdersActivity" android:exported="false" />
+        <activity android:name=".delivery.DeliveryShopsActivity" android:exported="false" />
+        <activity android:name=".baseActivities.CheckoutActivity" android:exported="false" />
+        <activity android:name=".baseActivities.MapPickerActivity" android:exported="false" />
+        <activity android:name=".baseActivities.AddProductActivity" android:exported="false" />
+        <activity android:name=".baseActivities.ProductActivity" android:exported="false" />
+        <activity android:name=".baseActivities.ShopProductsActivity" android:exported="false" />
+        <activity android:name=".baseActivities.CartActivity" android:exported="false" />
+        <activity android:name=".ShopsActivity" android:exported="false" />
+        <activity android:name=".menu" android:exported="false" />
+        <activity android:name=".baseActivities.HomeCustomerActivity" android:exported="false" />
+        <activity android:name=".baseActivities.HomeMerchantActivity" android:exported="false" />
+        <activity android:name=".baseActivities.LoginActivity"
+            android:exported="false"
+            android:label="Login"
+            android:theme="@style/Theme.Cravings" />
+        <activity android:name=".baseActivities.SignupActivity"
+            android:exported="false"
+            android:label="Register" />
+        <activity android:name=".baseActivities.ProfileActivity"
+            android:exported="false"
+            android:label="Cravings Home" />
+        <activity android:name=".baseActivities.MainActivity"
+            android:exported="false"
+            android:label="Main" />
+        <activity android:name=".baseActivities.EditProductActivity"
             android:exported="false" />
-        <activity
-            android:name=".baseActivities.AddProductActivity"
-            android:exported="false" />
-        <activity
-            android:name=".baseActivities.ProductActivity"
-            android:exported="false" />
-        <activity
-            android:name=".baseActivities.ShopProductsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".baseActivities.CartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ShopsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".menu"
-            android:exported="false" /> <!-- Role Selection screen (main entry point) -->
+
+        <!-- Launcher Activity -->
         <activity
             android:name=".baseActivities.RoleSelectionActivity"
             android:exported="true"
             android:label="Cravings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".baseActivities.HomeCustomerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".baseActivities.HomeMerchantActivity"
-            android:exported="false" /> <!-- Role Selection screen (main entry point) -->
-        <!-- Login screen -->
-        <activity
-            android:name=".baseActivities.LoginActivity"
-            android:exported="false"
-            android:label="Login"
-            android:theme="@style/Theme.Cravings" /> <!-- Registration screen -->
-        <activity
-            android:name=".baseActivities.SignupActivity"
-            android:exported="false"
-            android:label="Register" /> <!-- Home screen -->
-        <activity
-            android:name=".baseActivities.ProfileActivity"
-            android:exported="false"
-            android:label="Cravings Home" /> <!-- Optional: MainActivity (if still used for testing) -->
-        <activity
-            android:name=".baseActivities.MainActivity"
-            android:exported="false"
-            android:label="Main" />
-        <activity
-            android:name=".baseActivities.EditProductActivity"
-            android:exported="false" />
+
+        <!-- Firebase Messaging Service -->
+        <service
+            android:name=".notifications.OrderNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
