@@ -35,7 +35,6 @@ class OrdersFragment : Fragment() {
     private lateinit var adapter: OrdersAdapter
     private val ordersList = mutableListOf<Order>()
 
-    // Track last status for notifications
     private val lastStatusMap = mutableMapOf<String, String>()
 
     private val orderListeners = mutableMapOf<String, ValueEventListener>()
@@ -56,7 +55,7 @@ class OrdersFragment : Fragment() {
         emptyStateLayout = view.findViewById(R.id.emptyStateLayout)
         progressBar = view.findViewById(R.id.progressBar)
 
-        ordersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        ordersRecyclerView.layoutManager = LinearLayoutManager(context)
         adapter = OrdersAdapter(ordersList)
         ordersRecyclerView.adapter = adapter
 
@@ -66,6 +65,10 @@ class OrdersFragment : Fragment() {
         return view
     }
 
+
+    // -------------------------------------------------------------------------
+    //  FETCH ORDERS (Realtime)
+    // -------------------------------------------------------------------------
     private fun fetchCustomerOrdersRealtime() {
         val uid = auth.currentUser?.uid ?: return
 
@@ -77,6 +80,9 @@ class OrdersFragment : Fragment() {
 
         customerOrdersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+
+                if (!isAdded || view == null) return  // SAFE
+
                 if (!snapshot.exists() || !snapshot.hasChildren()) {
                     showEmptyState()
                     return
@@ -101,13 +107,21 @@ class OrdersFragment : Fragment() {
         })
     }
 
+
+    // -------------------------------------------------------------------------
+    //  LISTEN FOR EACH ORDER
+    // -------------------------------------------------------------------------
     private fun setupOrderListener(customerUid: String, shopUid: String, orderId: String) {
+
         val merchantOrderRef = database.reference
             .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
 
         val listener = object : ValueEventListener {
             @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
             override fun onDataChange(snapshot: DataSnapshot) {
+
+                if (!isAdded || view == null) return   // SAFETY CHECK
+
                 if (!snapshot.exists()) {
                     removeOrderFromList(orderId)
                     return
@@ -145,8 +159,9 @@ class OrdersFragment : Fragment() {
                 // Send notification if status changed
                 val key = "${shopUid}_$orderId"
                 val lastStatus = lastStatusMap[key]
+
                 if (lastStatus != null && lastStatus != status) {
-                    sendStatusNotification(order)
+                    sendStatusNotification(order)     // SAFE VERSION
                 }
                 lastStatusMap[key] = status ?: ""
 
@@ -162,11 +177,17 @@ class OrdersFragment : Fragment() {
         orderListeners["$shopUid-$orderId"] = listener
     }
 
-    private fun updateOrderInList(order: Order) {
-        val existingIndex = ordersList.indexOfFirst { it.orderId == order.orderId }
 
-        if (existingIndex != -1) {
-            ordersList[existingIndex] = order
+    // -------------------------------------------------------------------------
+    //  UPDATE ORDER LIST
+    // -------------------------------------------------------------------------
+    private fun updateOrderInList(order: Order) {
+        if (!isAdded || view == null) return   // SAFETY
+
+        val index = ordersList.indexOfFirst { it.orderId == order.orderId }
+
+        if (index != -1) {
+            ordersList[index] = order
         } else {
             ordersList.add(order)
         }
@@ -179,64 +200,96 @@ class OrdersFragment : Fragment() {
         adapter.notifyDataSetChanged()
     }
 
+
     private fun removeOrderFromList(orderId: String) {
+        if (!isAdded || view == null) return   // SAFETY
+
         val removed = ordersList.removeAll { it.orderId == orderId }
         if (removed) {
             if (ordersList.isEmpty()) showEmptyState() else adapter.notifyDataSetChanged()
         }
     }
 
+
     private fun removeAllOrderListeners() {
+        val uid = auth.currentUser?.uid ?: return
+
         orderListeners.forEach { (key, listener) ->
             val parts = key.split("-")
             if (parts.size == 2) {
                 val shopUid = parts[0]
                 val orderId = parts[1]
-                val customerUid = auth.currentUser?.uid ?: return
+
                 database.reference
-                    .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
+                    .child("users/Merchant/$shopUid/orders/$uid/$orderId")
                     .removeEventListener(listener)
             }
         }
         orderListeners.clear()
     }
 
+
+    // -------------------------------------------------------------------------
+    //  EMPTY STATE
+    // -------------------------------------------------------------------------
     private fun showEmptyState() {
+        if (!isAdded || view == null) return   // SAFETY
+
         progressBar.visibility = View.GONE
         emptyStateLayout.visibility = View.VISIBLE
         ordersRecyclerView.visibility = View.GONE
     }
 
+
+    // -------------------------------------------------------------------------
+    //  SAFE NOTIFICATION METHOD
+    // -------------------------------------------------------------------------
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun sendStatusNotification(order: Order) {
-        val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+
+        val ctx = context ?: return    // SAFE replacement for requireContext()
+
+        val builder = NotificationCompat.Builder(ctx, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Order Status Updated")
             .setContentText("Order #${order.orderId?.take(8)} is now '${order.status}'")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
-        NotificationManagerCompat.from(requireContext()).notify(order.orderId.hashCode(), builder.build())
+        // SAFETY CHECK
+        if (!isAdded) return
+
+        NotificationManagerCompat.from(ctx)
+            .notify(order.orderId.hashCode(), builder.build())
     }
 
+
+    // -------------------------------------------------------------------------
+    //  NOTIFICATION CHANNEL
+    // -------------------------------------------------------------------------
     private fun createNotificationChannel() {
+        val ctx = context ?: return
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Order Status"
-            val descriptionText = "Notifications for order status changes"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Order Status",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications for order status updates"
             }
-            val notificationManager: NotificationManager =
-                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+
+            val manager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         removeAllOrderListeners()
     }
+
 
     companion object {
         fun newInstance(role: String): OrdersFragment {

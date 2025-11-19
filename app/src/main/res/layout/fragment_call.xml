@@ -1,18 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="#F5F5F5"
+    android:fillViewport="true">
 
-    <Button
-        android:id="@+id/goToVoipButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Open VoIP Screen"
-        android:padding="16dp"
-        android:background="#4CAF50" />
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📞 Voice Call"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#FF8C00"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="40dp"
+            android:fontFamily="sans-serif-medium" />
 
-</LinearLayout>
+        <!-- Status Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#E3F2FD">
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ready to call"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:padding="16dp"
+                android:textColor="#1976D2"
+                android:fontFamily="sans-serif-medium" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Connection Details Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Connection Details"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <!-- IP Address -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remote IP Address"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif" />
+
+                <EditText
+                    android:id="@+id/ipInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="e.g., 192.168.1.100"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_input"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#999999"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Port -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Port Number"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif" />
+
+                <EditText
+                    android:id="@+id/portInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="e.g., 5000"
+                    android:inputType="number"
+                    android:minHeight="48dp"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_input"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#999999" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Call Button -->
+        <Button
+            android:id="@+id/callButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="📞 Start Call"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#4CAF50"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Hangup Button -->
+        <Button
+            android:id="@+id/hangupButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="📵 End Call"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#F44336" />
+
+        <!-- Info Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💡 Both devices must use the same port number"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif" />
+    </LinearLayout>
+</ScrollView>
