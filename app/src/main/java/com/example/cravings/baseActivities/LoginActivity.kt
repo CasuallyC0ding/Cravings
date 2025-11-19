@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -26,7 +27,6 @@ class LoginActivity : AppCompatActivity() {
 
         val userRole = intent.getStringExtra("userRole") ?: return
 
-        // Get top-left role text view
         val loginRoleText = findViewById<TextView>(R.id.loginRoleText)
         loginRoleText.text = userRole.uppercase()
 
@@ -53,12 +53,28 @@ class LoginActivity : AppCompatActivity() {
                     database.reference.child("users").child(userRole).child(userId).get()
                         .addOnSuccessListener { snapshot ->
                             if (snapshot.exists()) {
+
+                                // ================================
+                                // SAVE DEVICE FCM TOKEN BY ROLE
+                                // ================================
+                                FirebaseMessaging.getInstance().token
+                                    .addOnSuccessListener { token ->
+                                        database.reference
+                                            .child("users")
+                                            .child(userRole)  // "Merchant" or "Customer"
+                                            .child(userId)
+                                            .child("fcmToken")
+                                            .setValue(token)
+                                    }
+
                                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
+
                                 val intent = when (userRole.lowercase()) {
                                     "merchant" -> Intent(this, HomeMerchantActivity::class.java)
                                     "customer" -> Intent(this, HomeCustomerActivity::class.java)
                                     else -> Intent(this, ProfileActivity::class.java)
                                 }
+
                                 intent.putExtra("userRole", userRole)
                                 startActivity(intent)
                                 finish()
