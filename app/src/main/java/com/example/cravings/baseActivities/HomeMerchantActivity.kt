@@ -30,7 +30,7 @@ class HomeMerchantActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance(
-            "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
+            "https://dbcravings-default-rtdb-europe-west1.firebasedatabase.app/"
         )
 
         profileButton = findViewById(R.id.profileButton)
@@ -65,6 +65,22 @@ class HomeMerchantActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+
+        // 🔥 Added: Handle opening Orders tab when launched from notification
+        val openOrders = intent.getBooleanExtra("open_orders", false)
+        if (openOrders) {
+            viewPager.post {
+                viewPager.currentItem = 1  // Orders tab
+            }
+        }
+
+        // 🔥 Added: Handle opening Products tab from stock alert notification
+        val openProducts = intent.getBooleanExtra("open_products", false)
+        if (openProducts) {
+            viewPager.post {
+                viewPager.currentItem = 0  // Products tab
+            }
+        }
     }
 
     override fun onResume() {
@@ -117,6 +133,13 @@ class HomeMerchantActivity : AppCompatActivity() {
         if (intent.getBooleanExtra("open_orders", false)) {
             viewPager.post {
                 viewPager.currentItem = 1
+            }
+        }
+
+        // 🔥 Added: Handle Products tab in running activity
+        if (intent.getBooleanExtra("open_products", false)) {
+            viewPager.post {
+                viewPager.currentItem = 0
             }
         }
     }

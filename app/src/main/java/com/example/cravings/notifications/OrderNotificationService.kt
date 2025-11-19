@@ -9,29 +9,29 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.cravings.R
 import com.example.cravings.baseActivities.HomeMerchantActivity
+import com.example.cravings.baseActivities.HomeCustomerActivity
+import com.example.cravings.baseActivities.EditProductActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlin.text.get
 
-// this receives the FCM from the buyer and then creates a notification
 class OrderNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
-        val title = remoteMessage.notification?.title ?: "New Order"
-        val body = remoteMessage.notification?.body ?: "A customer just placed an order"
+        val title = remoteMessage.notification?.title ?: "Notification"
+        val body = remoteMessage.notification?.body ?: ""
+        val type = remoteMessage.data["type"] ?: ""
         val orderId = remoteMessage.data["orderId"]
 
-        showNotification(title, body, orderId)
+        showNotification(title, body, type, orderId)
     }
 
-    private fun showNotification(title: String, body: String, orderId: String?) {
+    private fun showNotification(title: String, body: String, type: String, orderId: String?) {
 
         val channelId = "orders_channel"
 
-        // Create notification channel for Android 8+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -42,10 +42,52 @@ class OrderNotificationService : FirebaseMessagingService() {
                 .createNotificationChannel(channel)
         }
 
-        // Open HomeMerchantActivity and force open Orders tab
-        val intent = Intent(this, HomeMerchantActivity::class.java)
-        intent.putExtra("open_orders", true)
-        intent.putExtra("orderId", orderId)
+        // 🔥 Routing logic based on 'type' sent by the server
+        //type = "order_status"           → customer statuses
+        //type = "new_order"              → merchant new order
+        //type = "merchant_status"        → delivered, get orders
+        //type = "stock_alert"            → stock alert
+        val intent: Intent = when (type) {
+
+            // ============================
+            // CUSTOMER NOTIFICATIONS
+            // ============================
+            "order_status" -> {
+                // Always open the Orders tab in HomeCustomerActivity
+                Intent(this, HomeCustomerActivity::class.java).apply {
+                    putExtra("open_orders", true)
+                    putExtra("orderId", orderId)
+                }
+            }
+
+            // ============================
+            // MERCHANT NOTIFICATIONS
+            // ============================
+
+            "new_order",
+            "merchant_status" -> {
+                Intent(this, HomeMerchantActivity::class.java).apply {
+                    putExtra("open_orders", true)
+                    putExtra("orderId", orderId)
+                }
+            }
+
+            // ============================
+            // STOCK ALERT → Products tab
+            // ============================
+            "stock_alert" -> {
+                Intent(this, HomeMerchantActivity::class.java).apply {
+                    putExtra("open_products", true)
+                }
+            }
+
+
+            // Default fallback
+            else -> {
+                Intent(this, HomeMerchantActivity::class.java)
+            }
+        }
+
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntent = PendingIntent.getActivity(
@@ -64,17 +106,15 @@ class OrderNotificationService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .build()
 
-        // Android 13+ requires checking notification permission
         if (NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()) {
             NotificationManagerCompat.from(applicationContext)
                 .notify(System.currentTimeMillis().toInt(), notification)
         }
-
     }
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        // Save updated token for the current user if logged in
         val uid = FirebaseAuth.getInstance().uid ?: return
 
         FirebaseDatabase.getInstance(
@@ -82,5 +122,4 @@ class OrderNotificationService : FirebaseMessagingService() {
         ).reference.child("users").child("Merchant").child(uid).child("fcmToken")
             .setValue(token)
     }
-
 }

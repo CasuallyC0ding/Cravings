@@ -53,5 +53,10 @@ class HomeCustomerActivity : AppCompatActivity() {
         if (openOrdersTab) {
             viewPager.currentItem = 1
         }
+        val openOrders = intent.getBooleanExtra("open_orders", false)
+        if (openOrders) {
+            viewPager.currentItem = 1
+        }
+
     }
 }
