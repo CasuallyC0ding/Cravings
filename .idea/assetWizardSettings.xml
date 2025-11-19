@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../Omar%20Ahmed/AppData/Local/Android/Sdk/icons/material/materialicons/location_on/baseline_location_on_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../Omar%20Ahmed/AppData/Local/Android/Sdk/icons/material/materialicons/10k/baseline_10k_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -33,7 +33,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_map" />
+                            <entry key="outputName" value="ic_call" />
                             <entry key="sourceFile" value="C:\Users\HP\StudioProjects\Cravings\Signaing\Cravings" />
                           </map>
                         </option>

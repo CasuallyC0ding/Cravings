@@ -61,7 +61,7 @@ class HomeMerchantActivity : AppCompatActivity() {
                 }
                 2 ->{
                     tab.text="VOIP"
-                    tab.setIcon(R.drawable.ic_add)
+                    tab.setIcon(R.drawable.ic_call)
 
                 }
             }

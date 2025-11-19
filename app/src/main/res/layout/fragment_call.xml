@@ -11,6 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Open VoIP Screen"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:background="#4CAF50" />
+
 
 </LinearLayout>
