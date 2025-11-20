@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.cravings.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class SignupActivity : AppCompatActivity() {
 
@@ -19,7 +20,6 @@ class SignupActivity : AppCompatActivity() {
         setContentView(R.layout.activity_signup)
 
         auth = FirebaseAuth.getInstance()
-        // ✅ Explicitly connect to your database URL
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
         val userRole = intent.getStringExtra("userRole")
@@ -71,11 +71,26 @@ class SignupActivity : AppCompatActivity() {
                         if (userRole != null) {
                             database.reference.child("users").child(userRole).child(uid).setValue(userMap)
                                 .addOnSuccessListener {
+
+                                    // ====================================================
+                                    // ONLY ADDITION: SAVE FCM TOKEN AFTER SIGNUP
+                                    // ====================================================
+                                    FirebaseMessaging.getInstance().token
+                                        .addOnSuccessListener { token ->
+                                            database.reference
+                                                .child("users")
+                                                .child(userRole)   // Merchant or Customer
+                                                .child(uid)
+                                                .child("fcmToken")
+                                                .setValue(token)
+                                        }
+                                    // ====================================================
+
                                     Toast.makeText(this, "Account created successfully! Please log in.", Toast.LENGTH_SHORT).show()
                                     auth.signOut()
 
                                     val intent = Intent(this, LoginActivity::class.java)
-                                    intent.putExtra("userRole", userRole) // Pass role back to Login screen
+                                    intent.putExtra("userRole", userRole)
                                     startActivity(intent)
                                     finish()
                                 }
@@ -88,8 +103,6 @@ class SignupActivity : AppCompatActivity() {
                         Toast.makeText(this, "Error: $error", Toast.LENGTH_LONG).show()
                     }
                 }
-
-
         }
 
         loginRedirect.setOnClickListener {

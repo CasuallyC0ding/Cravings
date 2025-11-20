@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.cravings.R
 import com.example.cravings.baseActivities.ShopProductsActivity
 import com.example.cravings.models.Shop
@@ -18,7 +19,6 @@ class ShopAdapter(private val shopList: List<Shop>) :
     class ShopViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val shopImage: ImageView = itemView.findViewById(R.id.shopImage)
         val shopName: TextView = itemView.findViewById(R.id.shopName)
-        val shopDescription: TextView = itemView.findViewById(R.id.shopDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
@@ -30,30 +30,25 @@ class ShopAdapter(private val shopList: List<Shop>) :
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
         holder.shopName.text = shop.shopName
-        //holder.shopDescription.text = shop.description
 
-        if (!shop.profileImage.isNullOrEmpty()){
-        Glide.with(holder.itemView.context)
-            .load(shop.profileImage)
-            .placeholder(R.drawable.ic_profile_placeholder)
-            .error(R.drawable.ic_profile_placeholder)
-            .into(holder.shopImage)
-    }
-        else{
+        if (!shop.profileImage.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(shop.profileImage)
+                .placeholder(R.drawable.ic_profile_placeholder)
+                .error(R.drawable.ic_profile_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(holder.shopImage)
+        } else {
             holder.shopImage.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
-
-
         holder.itemView.setOnClickListener {
-            holder.itemView.setOnClickListener {
-                val context = holder.itemView.context
-                val intent = Intent(context, ShopProductsActivity::class.java)
-                intent.putExtra("shopId", shop.uid) // Make sure your Shop model has an 'id' field
-                context.startActivity(intent)
-            }
-
-
+            val context = holder.itemView.context
+            val intent = Intent(context, ShopProductsActivity::class.java)
+            intent.putExtra("shopId", shop.uid)
+            intent.putExtra("shopName", shop.shopName)
+            context.startActivity(intent)
         }
     }
 

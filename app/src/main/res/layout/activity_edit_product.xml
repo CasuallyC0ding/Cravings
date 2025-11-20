@@ -136,18 +136,6 @@
             android:weightSum="2">
 
             <Button
-                android:id="@+id/btnUpdateProduct"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Update Product"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#FF8C00"
-                android:elevation="2dp"
-                android:layout_marginEnd="8dp" />
-
-            <Button
                 android:id="@+id/btnDeleteProduct"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -156,6 +144,18 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:backgroundTint="#DC3545"
+                android:elevation="2dp"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnUpdateProduct"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Update Product"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#FF8C00"
                 android:elevation="2dp"
                 android:layout_marginStart="8dp" />
         </LinearLayout>

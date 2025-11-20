@@ -1,5 +1,10 @@
 package com.example.cravings.customerFragments
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.annotation.RequiresPermission
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +35,11 @@ class OrdersFragment : Fragment() {
     private lateinit var adapter: OrdersAdapter
     private val ordersList = mutableListOf<Order>()
 
+    private val lastStatusMap = mutableMapOf<String, String>()
+
     private val orderListeners = mutableMapOf<String, ValueEventListener>()
+
+    private val CHANNEL_ID = "order_status_channel"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,15 +55,20 @@ class OrdersFragment : Fragment() {
         emptyStateLayout = view.findViewById(R.id.emptyStateLayout)
         progressBar = view.findViewById(R.id.progressBar)
 
-        ordersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        ordersRecyclerView.layoutManager = LinearLayoutManager(context)
         adapter = OrdersAdapter(ordersList)
         ordersRecyclerView.adapter = adapter
 
+        createNotificationChannel()
         fetchCustomerOrdersRealtime()
 
         return view
     }
 
+
+    // -------------------------------------------------------------------------
+    //  FETCH ORDERS (Realtime)
+    // -------------------------------------------------------------------------
     private fun fetchCustomerOrdersRealtime() {
         val uid = auth.currentUser?.uid ?: return
 
@@ -61,19 +78,19 @@ class OrdersFragment : Fragment() {
 
         val customerOrdersRef = database.reference.child("users/Customer/$uid/orders")
 
-        // Listen to customer's order references
         customerOrdersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+
+                if (!isAdded || view == null) return  // SAFE
+
                 if (!snapshot.exists() || !snapshot.hasChildren()) {
                     showEmptyState()
                     return
                 }
 
-                // Clear existing listeners
                 removeAllOrderListeners()
                 ordersList.clear()
 
-                // Set up listeners for each merchant's orders
                 for (shopSnap in snapshot.children) {
                     val shopUid = shopSnap.key ?: continue
                     for (orderSnap in shopSnap.children) {
@@ -90,14 +107,22 @@ class OrdersFragment : Fragment() {
         })
     }
 
+
+    // -------------------------------------------------------------------------
+    //  LISTEN FOR EACH ORDER
+    // -------------------------------------------------------------------------
     private fun setupOrderListener(customerUid: String, shopUid: String, orderId: String) {
+
         val merchantOrderRef = database.reference
             .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
 
         val listener = object : ValueEventListener {
+            @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
             override fun onDataChange(snapshot: DataSnapshot) {
+
+                if (!isAdded || view == null) return   // SAFETY CHECK
+
                 if (!snapshot.exists()) {
-                    // Order was deleted
                     removeOrderFromList(orderId)
                     return
                 }
@@ -113,6 +138,8 @@ class OrdersFragment : Fragment() {
                     )
                 }
 
+                val status = snapshot.child("status").getValue(String::class.java)
+
                 val order = Order(
                     orderId = orderId,
                     shopUid = shopUid,
@@ -124,13 +151,21 @@ class OrdersFragment : Fragment() {
                     pickupMethod = snapshot.child("pickupMethod").getValue(String::class.java),
                     deliveryLat = snapshot.child("deliveryLat").getValue(Double::class.java),
                     deliveryLng = snapshot.child("deliveryLng").getValue(Double::class.java),
-                    status = snapshot.child("status").getValue(String::class.java),
+                    status = status,
                     timestamp = snapshot.child("timestamp").getValue(Long::class.java),
                     shopName = snapshot.child("shopName").getValue(String::class.java)
                 )
 
+                // Send notification if status changed
+                val key = "${shopUid}_$orderId"
+                val lastStatus = lastStatusMap[key]
+
+                if (lastStatus != null && lastStatus != status) {
+                    sendStatusNotification(order)     // SAFE VERSION
+                }
+                lastStatusMap[key] = status ?: ""
+
                 updateOrderInList(order)
-                Log.d("OrdersFragment", "Order updated: ${order.orderId} - ${order.shopName}")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -142,18 +177,21 @@ class OrdersFragment : Fragment() {
         orderListeners["$shopUid-$orderId"] = listener
     }
 
-    private fun updateOrderInList(order: Order) {
-        val existingIndex = ordersList.indexOfFirst { it.orderId == order.orderId }
 
-        if (existingIndex != -1) {
-            // Update existing order
-            ordersList[existingIndex] = order
+    // -------------------------------------------------------------------------
+    //  UPDATE ORDER LIST
+    // -------------------------------------------------------------------------
+    private fun updateOrderInList(order: Order) {
+        if (!isAdded || view == null) return   // SAFETY
+
+        val index = ordersList.indexOfFirst { it.orderId == order.orderId }
+
+        if (index != -1) {
+            ordersList[index] = order
         } else {
-            // Add new order
             ordersList.add(order)
         }
 
-        // Sort by timestamp (newest first)
         ordersList.sortByDescending { it.timestamp }
 
         progressBar.visibility = View.GONE
@@ -162,53 +200,96 @@ class OrdersFragment : Fragment() {
         adapter.notifyDataSetChanged()
     }
 
+
     private fun removeOrderFromList(orderId: String) {
+        if (!isAdded || view == null) return   // SAFETY
+
         val removed = ordersList.removeAll { it.orderId == orderId }
         if (removed) {
-            Log.d("OrdersFragment", "Order removed: $orderId")
-            if (ordersList.isEmpty()) {
-                showEmptyState()
-            } else {
-                adapter.notifyDataSetChanged()
-            }
+            if (ordersList.isEmpty()) showEmptyState() else adapter.notifyDataSetChanged()
         }
     }
 
+
     private fun removeAllOrderListeners() {
+        val uid = auth.currentUser?.uid ?: return
+
         orderListeners.forEach { (key, listener) ->
             val parts = key.split("-")
             if (parts.size == 2) {
                 val shopUid = parts[0]
                 val orderId = parts[1]
-                val customerUid = auth.currentUser?.uid ?: return
+
                 database.reference
-                    .child("users/Merchant/$shopUid/orders/$customerUid/$orderId")
+                    .child("users/Merchant/$shopUid/orders/$uid/$orderId")
                     .removeEventListener(listener)
             }
         }
         orderListeners.clear()
     }
 
+
+    // -------------------------------------------------------------------------
+    //  EMPTY STATE
+    // -------------------------------------------------------------------------
     private fun showEmptyState() {
+        if (!isAdded || view == null) return   // SAFETY
+
         progressBar.visibility = View.GONE
         emptyStateLayout.visibility = View.VISIBLE
         ordersRecyclerView.visibility = View.GONE
     }
 
+
+    // -------------------------------------------------------------------------
+    //  SAFE NOTIFICATION METHOD
+    // -------------------------------------------------------------------------
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    private fun sendStatusNotification(order: Order) {
+
+        val ctx = context ?: return    // SAFE replacement for requireContext()
+
+        val builder = NotificationCompat.Builder(ctx, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Order Status Updated")
+            .setContentText("Order #${order.orderId?.take(8)} is now '${order.status}'")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        // SAFETY CHECK
+        if (!isAdded) return
+
+        NotificationManagerCompat.from(ctx)
+            .notify(order.orderId.hashCode(), builder.build())
+    }
+
+
+    // -------------------------------------------------------------------------
+    //  NOTIFICATION CHANNEL
+    // -------------------------------------------------------------------------
+    private fun createNotificationChannel() {
+        val ctx = context ?: return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Order Status",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications for order status updates"
+            }
+
+            val manager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         removeAllOrderListeners()
-
-        // Also remove the customer orders listener
-        val uid = auth.currentUser?.uid
-        if (uid != null) {
-            database.reference.child("users/Customer/$uid/orders")
-                .removeEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {}
-                    override fun onCancelled(error: DatabaseError) {}
-                })
-        }
     }
+
 
     companion object {
         fun newInstance(role: String): OrdersFragment {

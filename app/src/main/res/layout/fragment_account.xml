@@ -121,12 +121,10 @@
                     android:id="@+id/btnEditProfile"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Edit Profile"
+                    android:text="✏️ Edit Profile"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#FF8C00"
                     android:textStyle="bold"
-                    android:drawableStart="@android:drawable/ic_menu_edit"
-                    android:drawableTint="#FFFFFF"
                     android:gravity="center"
                     android:layout_marginBottom="8dp"/>
 
@@ -135,11 +133,25 @@
                     android:id="@+id/btnDeliveryVolunteer"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="🚚 Become a Delivery Volunteer"
+                    android:text="🚚 Deliver food"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#2196F3"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/btnvoip"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="📞 Call"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#4CAF50"
                     android:textStyle="bold"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
+
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

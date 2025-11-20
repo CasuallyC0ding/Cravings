@@ -4,22 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".baseActivities.HomeMerchantActivity">
-
-    <!-- Background image -->
-    <ImageView
-        android:id="@+id/bgImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/food_pattern_bg_dark"
-        android:contentDescription="Background" />
-
-    <!-- Dark gradient overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/dark_gradient_overlay" />
+    android:background="#FFFFFF"
+    tools:context=".HomeMerchantActivity">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -29,60 +15,64 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="@android:color/transparent">
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-        <TextView
-            android:id="@+id/roleText"
-            android:layout_width="wrap_content"
+        <!-- App Logo/Name -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="MERCHANT"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFD180"
             android:layout_weight="1"
-            android:fontFamily="@font/dancing_script_semibold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🍴"
+                android:textSize="24sp"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cravingsr"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#FF8C00"
+                android:fontFamily="@font/dancing_script_bold" />
+        </LinearLayout>
+
+        <!-- Profile Button -->
         <ImageView
             android:id="@+id/profileButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="end"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_profile_placeholder"
             android:background="@drawable/circle_background"
             android:clipToOutline="true"
             android:contentDescription="Profile" />
     </LinearLayout>
 
-    <!-- ViewPager2 for fragments -->
+    <!-- ViewPager fills screen -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_below="@id/topBar"
-        android:layout_above="@id/tabLayout" />
+        android:layout_above="@id/tabLayout"/>
 
-    <!-- Bottom TabLayout -->
+    <!-- Bottom Tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/tab_layout_background"
-        app:tabTextColor="#FFFFFF"
-        app:tabSelectedTextColor="#FFD180"
-        app:tabIndicatorColor="#FFD180"
-        app:tabIndicatorHeight="3dp">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Products" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Orders" />
-
-    </com.google.android.material.tabs.TabLayout>
-
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:tabIconTint="@color/nav_item_color"
+        app:tabTextColor="#757575"
+        app:tabSelectedTextColor="#FF8C00"
+        app:tabIndicatorColor="#FF8C00"
+        app:tabIndicatorHeight="3dp" />
 </RelativeLayout>

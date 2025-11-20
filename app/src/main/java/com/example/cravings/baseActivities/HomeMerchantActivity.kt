@@ -30,7 +30,7 @@ class HomeMerchantActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance(
-            "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
+            "https://dbcravings-default-rtdb-europe-west1.firebasedatabase.app/"
         )
 
         profileButton = findViewById(R.id.profileButton)
@@ -59,8 +59,28 @@ class HomeMerchantActivity : AppCompatActivity() {
                     tab.text = "Orders"
                     tab.setIcon(R.drawable.ic_orders)
                 }
+                2 -> {
+                    tab.text = "VOIP"
+                    tab.setIcon(R.drawable.ic_call)
+                }
             }
         }.attach()
+
+        // 🔥 Added: Handle opening Orders tab when launched from notification
+        val openOrders = intent.getBooleanExtra("open_orders", false)
+        if (openOrders) {
+            viewPager.post {
+                viewPager.currentItem = 1  // Orders tab
+            }
+        }
+
+        // 🔥 Added: Handle opening Products tab from stock alert notification
+        val openProducts = intent.getBooleanExtra("open_products", false)
+        if (openProducts) {
+            viewPager.post {
+                viewPager.currentItem = 0  // Products tab
+            }
+        }
     }
 
     override fun onResume() {
@@ -99,5 +119,28 @@ class HomeMerchantActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
+
+    // --- Handle notification click when Activity is already running ---
+    // This method is called when HomeMerchantActivity is already open
+    // (in background or foreground) and a new Intent is delivered to it.
+    // We send an extra "open_orders = true" from the notification.
+    // If the user taps the notification, this block switches the ViewPager
+    // to the Orders tab (index 1) without recreating the Activity.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        if (intent.getBooleanExtra("open_orders", false)) {
+            viewPager.post {
+                viewPager.currentItem = 1
+            }
+        }
+
+        // 🔥 Added: Handle Products tab in running activity
+        if (intent.getBooleanExtra("open_products", false)) {
+            viewPager.post {
+                viewPager.currentItem = 0
+            }
+        }
     }
 }
