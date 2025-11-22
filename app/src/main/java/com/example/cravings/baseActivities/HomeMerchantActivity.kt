@@ -2,6 +2,7 @@ package com.example.cravings.baseActivities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,12 +11,17 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.cravings.R
 import com.example.cravings.adapters.MerchantPagerAdapter
+import com.example.cravings.utils.FCMTokenManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class HomeMerchantActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "HomeMerchantActivity"
+    }
 
     private lateinit var profileButton: ImageView
     private lateinit var auth: FirebaseAuth
@@ -28,9 +34,11 @@ class HomeMerchantActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_merchant)
 
+        Log.d(TAG, "onCreate called")
+
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance(
-            "https://dbcravings-default-rtdb-europe-west1.firebasedatabase.app/"
+            "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
         )
 
         profileButton = findViewById(R.id.profileButton)
@@ -66,21 +74,11 @@ class HomeMerchantActivity : AppCompatActivity() {
             }
         }.attach()
 
-        // 🔥 Added: Handle opening Orders tab when launched from notification
-        val openOrders = intent.getBooleanExtra("open_orders", false)
-        if (openOrders) {
-            viewPager.post {
-                viewPager.currentItem = 1  // Orders tab
-            }
-        }
+        // Save FCM token for this merchant
+        FCMTokenManager.saveTokenForUser("Merchant")
 
-        // 🔥 Added: Handle opening Products tab from stock alert notification
-        val openProducts = intent.getBooleanExtra("open_products", false)
-        if (openProducts) {
-            viewPager.post {
-                viewPager.currentItem = 0  // Products tab
-            }
-        }
+        // Handle notification click
+        handleNotificationIntent(intent)
     }
 
     override fun onResume() {
@@ -121,25 +119,61 @@ class HomeMerchantActivity : AppCompatActivity() {
         })
     }
 
-    // --- Handle notification click when Activity is already running ---
-    // This method is called when HomeMerchantActivity is already open
-    // (in background or foreground) and a new Intent is delivered to it.
-    // We send an extra "open_orders = true" from the notification.
-    // If the user taps the notification, this block switches the ViewPager
-    // to the Orders tab (index 1) without recreating the Activity.
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent called")
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
 
-        if (intent.getBooleanExtra("open_orders", false)) {
-            viewPager.post {
-                viewPager.currentItem = 1
+    private fun handleNotificationIntent(intent: Intent) {
+        // Log all extras for debugging
+        val extras = intent.extras
+        Log.d(TAG, "handleNotificationIntent - extras: ${extras?.keySet()?.joinToString()}")
+
+        val openOrders = intent.getBooleanExtra("open_orders", false)
+        val openProducts = intent.getBooleanExtra("open_products", false)
+        val fromNotification = intent.getBooleanExtra("fromNotification", false)
+        val type = intent.getStringExtra("type") ?: ""
+        val orderId = intent.getStringExtra("orderId")
+        val productId = intent.getStringExtra("productId")
+        val productName = intent.getStringExtra("productName")
+
+        Log.d(TAG, "openOrders: $openOrders, openProducts: $openProducts, type: $type, orderId: $orderId, productId: $productId")
+
+        when {
+            openOrders -> {
+                Log.d(TAG, "Opening Orders tab")
+                viewPager.post {
+                    viewPager.currentItem = 1  // Orders tab
+                }
             }
-        }
+            openProducts || type == "stock_alert" -> {
+                Log.d(TAG, "Opening Products tab")
+                viewPager.post {
+                    viewPager.currentItem = 0  // Products tab
+                }
 
-        // 🔥 Added: Handle Products tab in running activity
-        if (intent.getBooleanExtra("open_products", false)) {
-            viewPager.post {
-                viewPager.currentItem = 0
+                // If from stock alert, wait a bit then launch EditProductActivity
+                if (fromNotification && type == "stock_alert" && !productId.isNullOrEmpty()) {
+                    Log.d(TAG, "Stock alert - productId: $productId, productName: $productName")
+
+                    viewPager.postDelayed({
+                        Toast.makeText(
+                            this,
+                            "⚠️ '$productName' is out of stock!",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        // Open EditProductActivity from within the app context
+                        val editIntent = Intent(this, EditProductActivity::class.java).apply {
+                            putExtra("productId", productId)
+                            putExtra("productName", productName)
+                            putExtra("fromNotification", true)
+                        }
+                        startActivity(editIntent)
+                    }, 1000) // Delay to allow Products tab to load first
+                }
             }
         }
     }

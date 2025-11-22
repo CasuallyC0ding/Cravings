@@ -30,6 +30,10 @@ class MerchantOrdersFragment : Fragment() {
     private val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
     private val customerNamesCache = mutableMapOf<String, String>()
 
+    // Store the listener reference to remove it later
+    private var ordersListener: ValueEventListener? = null
+    private var ordersRef: DatabaseReference? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,18 +44,33 @@ class MerchantOrdersFragment : Fragment() {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Remove listener when view is destroyed
+        ordersListener?.let { listener ->
+            ordersRef?.removeEventListener(listener)
+        }
+        ordersListener = null
+        ordersRef = null
+    }
+
     private fun loadOrders() {
         val merchantId = auth.currentUser?.uid ?: run {
             Log.e("FIREBASE", "No current user UID found!")
-            Toast.makeText(requireContext(), "Authentication error", Toast.LENGTH_SHORT).show()
+            if (isAdded && context != null) {
+                Toast.makeText(requireContext(), "Authentication error", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
-        val ordersRef = database.reference
+        ordersRef = database.reference
             .child("users").child(userRole).child(merchantId).child("orders")
 
-        ordersRef.addValueEventListener(object : ValueEventListener {
+        ordersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // SAFETY CHECK - fragment must be attached
+                if (!isAdded || view == null || context == null) return
+
                 ordersContainer.removeAllViews()
 
                 if (!snapshot.exists()) {
@@ -105,15 +124,21 @@ class MerchantOrdersFragment : Fragment() {
                     addEmpty("No orders yet")
                 } else {
                     fetchAllCustomerNames(customerIds.toList()) {
+                        // SAFETY CHECK again before updating UI
+                        if (!isAdded || view == null || context == null) return@fetchAllCustomerNames
                         ordersList.forEach { order -> addOrderCard(order) }
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load orders", Toast.LENGTH_LONG).show()
+                if (isAdded && context != null) {
+                    Toast.makeText(requireContext(), "Failed to load orders", Toast.LENGTH_LONG).show()
+                }
             }
-        })
+        }
+
+        ordersRef?.addValueEventListener(ordersListener!!)
     }
 
     private fun fetchAllCustomerNames(customerIds: List<String>, callback: () -> Unit) {
@@ -147,7 +172,13 @@ class MerchantOrdersFragment : Fragment() {
     }
 
     private fun addOrderCard(order: OrderData) {
-        val card = layoutInflater.inflate(R.layout.item_order_card, ordersContainer, false)
+        // CRITICAL SAFETY CHECK
+        if (!isAdded || view == null || context == null) return
+
+        val ctx = context ?: return
+        val inflater = LayoutInflater.from(ctx)
+
+        val card = inflater.inflate(R.layout.item_order_card, ordersContainer, false)
 
         val customerName = customerNamesCache[order.customerId] ?: "Unknown Customer"
         card.findViewById<TextView>(R.id.customerIdText)?.text = "Customer: $customerName"
@@ -170,9 +201,9 @@ class MerchantOrdersFragment : Fragment() {
         val drawable = GradientDrawable()
         drawable.shape = GradientDrawable.RECTANGLE
         drawable.cornerRadius = 20f
-        drawable.setColor(ContextCompat.getColor(requireContext(), backgroundColor))
+        drawable.setColor(ContextCompat.getColor(ctx, backgroundColor))
         statusText?.background = drawable
-        statusText?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+        statusText?.setTextColor(ContextCompat.getColor(ctx, android.R.color.white))
 
         val timeText = if (order.timestamp > 0) {
             dateFormat.format(Date(order.timestamp))
@@ -235,19 +266,20 @@ class MerchantOrdersFragment : Fragment() {
             .child(customerId).child(orderId).child("status")
             .setValue("rejected")
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Order Rejected", Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    Toast.makeText(requireContext(), "Order Rejected", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
-    // -------------------------------------------------------------
-    // 🔥🔥🔥 THIS IS THE ONLY PART THAT WAS MODIFIED (acceptOrder) 🔥🔥🔥
-    // -------------------------------------------------------------
     private fun acceptOrder(order: OrderData) {
         val merchantId = auth.currentUser?.uid ?: return
         val productsRef = database.reference.child("users").child(userRole).child(merchantId).child("products")
 
         productsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // SAFETY CHECK
+                if (!isAdded || context == null) return
 
                 val insufficientStock = mutableListOf<String>()
 
@@ -264,11 +296,13 @@ class MerchantOrdersFragment : Fragment() {
                 }
 
                 if (insufficientStock.isNotEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Insufficient stock:\n${insufficientStock.joinToString("\n")}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (isAdded && context != null) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Insufficient stock:\n${insufficientStock.joinToString("\n")}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                     return
                 }
 
@@ -281,7 +315,9 @@ class MerchantOrdersFragment : Fragment() {
                         .child("stock").setValue(newStock)
                 }
 
-                // 🔥 SHOW DELIVERY SELECTION DIALOG AFTER STOCK IS UPDATED
+                // SAFETY CHECK before showing dialog
+                if (!isAdded || context == null) return
+
                 val dialog = android.app.AlertDialog.Builder(requireContext())
                 dialog.setTitle("Choose Delivery Method")
                 dialog.setMessage("How do you want to deliver this order?")
@@ -295,17 +331,17 @@ class MerchantOrdersFragment : Fragment() {
                 }
 
                 dialog.setNeutralButton("Cancel", null)
-                if (order.pickupMethod!="shop") {
-
+                if (order.pickupMethod != "shop") {
                     dialog.show()
-                }
-                else{
+                } else {
                     updateOrderStatus(order, "order ready")
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to check stock", Toast.LENGTH_LONG).show()
+                if (isAdded && context != null) {
+                    Toast.makeText(requireContext(), "Failed to check stock", Toast.LENGTH_LONG).show()
+                }
             }
         })
     }
@@ -318,15 +354,19 @@ class MerchantOrdersFragment : Fragment() {
             .child(order.customerId).child(order.orderId)
             .child("status").setValue(newStatus)
             .addOnSuccessListener {
-                Toast.makeText(
-                    requireContext(),
-                    "Order updated: $newStatus",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (isAdded && context != null) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Order updated: $newStatus",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
     }
 
     private fun addEmpty(text: String) {
+        if (!isAdded || view == null || context == null) return
+
         val tv = TextView(requireContext())
         tv.text = text
         tv.textSize = 18f

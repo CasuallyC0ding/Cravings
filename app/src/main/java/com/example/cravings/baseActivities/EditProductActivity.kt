@@ -40,6 +40,7 @@ class EditProductActivity : AppCompatActivity() {
         private const val AWS_ACCESS_KEY = "" // your key
         private const val AWS_SECRET_KEY = "" // your key
         private const val BUCKET_NAME = "craversbkt"
+        private const val TAG = "EditProductActivity"
     }
 
     private val auth = FirebaseAuth.getInstance()
@@ -48,7 +49,6 @@ class EditProductActivity : AppCompatActivity() {
     private var selectedProductId: String? = null
     private var currentImageUrl: String? = null
     private var selectedImageUri: Uri? = null
-    private val TAG = "EditProductActivity"
 
     // --- AWS S3 client ---
     private val s3Client by lazy {
@@ -90,33 +90,80 @@ class EditProductActivity : AppCompatActivity() {
             .child(sellerId)
             .child("products")
 
-        selectedProductId = intent.getStringExtra("productId")
-        if (selectedProductId.isNullOrEmpty()) {
-            Toast.makeText(this, "No product selected", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        loadProductDetails(selectedProductId!!)
+        // Handle intent - check if from notification first
+        handleIntent(intent)
 
         backButton.setOnClickListener { finish() }
 
         uploadPhotoBtn.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            imagePickerLauncher.launch(intent)
+            val pickIntent = Intent(Intent.ACTION_PICK)
+            pickIntent.type = "image/*"
+            imagePickerLauncher.launch(pickIntent)
         }
 
         updateBtn.setOnClickListener { updateProduct() }
         deleteBtn.setOnClickListener { deleteProduct() }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val fromNotification = intent.getBooleanExtra("fromNotification", false)
+        val productId = intent.getStringExtra("productId")
+        val productName = intent.getStringExtra("productName")
+
+        Log.d(TAG, "handleIntent - fromNotification: $fromNotification, productId: $productId, productName: $productName")
+
+        if (fromNotification && !productId.isNullOrEmpty()) {
+            // From stock alert notification
+            selectedProductId = productId
+
+            Toast.makeText(
+                this,
+                "⚠️ '$productName' is out of stock!",
+                Toast.LENGTH_LONG
+            ).show()
+
+            loadProductDetails(productId)
+
+            // Focus on quantity field after loading
+            quantityField.postDelayed({
+                quantityField.requestFocus()
+                quantityField.selectAll()
+            }, 500)
+
+        } else if (!productId.isNullOrEmpty()) {
+            // Normal edit from ProductActivity
+            selectedProductId = productId
+            loadProductDetails(productId)
+        } else {
+            // No product ID provided
+            Toast.makeText(this, "No product selected", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+
     // --- Load product from Firebase ---
     private fun loadProductDetails(productId: String) {
+        Log.d(TAG, "Loading product: $productId")
+
         dbRef.child(productId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    Log.e(TAG, "Product not found: $productId")
+                    Toast.makeText(this@EditProductActivity, "Product not found", Toast.LENGTH_SHORT).show()
+                    finish()
+                    return
+                }
+
                 val product = snapshot.getValue(Product_Merchant::class.java)
                 if (product != null) {
+                    Log.d(TAG, "Product loaded: ${product.name}, stock: ${product.stock}")
+
                     nameField.setText(product.name)
                     priceField.setText(product.price.toString())
                     quantityField.setText(product.stock.toString())
@@ -130,6 +177,7 @@ class EditProductActivity : AppCompatActivity() {
                             .into(imagePreview)
                     }
                 } else {
+                    Log.e(TAG, "Failed to parse product")
                     Toast.makeText(this@EditProductActivity, "Product not found", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -137,6 +185,7 @@ class EditProductActivity : AppCompatActivity() {
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "Error loading product: ${error.message}")
+                Toast.makeText(this@EditProductActivity, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -247,7 +296,6 @@ class EditProductActivity : AppCompatActivity() {
     private fun deleteOldImageFromS3(imageUrl: String?) {
         if (imageUrl.isNullOrEmpty()) return
         try {
-            // Extract key correctly regardless of URL format
             val key = when {
                 imageUrl.contains(".amazonaws.com/") ->
                     imageUrl.substringAfter(".amazonaws.com/").substringBefore("?")
@@ -266,7 +314,6 @@ class EditProductActivity : AppCompatActivity() {
             Log.e(TAG, "❌ Failed to delete S3 image: ${e.message}", e)
         }
     }
-
 
     // --- Convert URI to File ---
     private fun getFileFromUri(uri: Uri): File? {

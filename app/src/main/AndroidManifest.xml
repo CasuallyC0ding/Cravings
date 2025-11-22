@@ -27,6 +27,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY_HERE" />
 
+        <!-- FCM Default Channel -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="orders_channel" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
         <!-- Activities -->
         <activity android:name=".baseActivities.VoipActivity" android:exported="false" />
         <activity android:name=".delivery.DeliveryOrdersActivity" android:exported="false" />
@@ -39,8 +48,19 @@
         <activity android:name=".baseActivities.CartActivity" android:exported="false" />
         <activity android:name=".ShopsActivity" android:exported="false" />
         <activity android:name=".menu" android:exported="false" />
-        <activity android:name=".baseActivities.HomeCustomerActivity" android:exported="false" />
-        <activity android:name=".baseActivities.HomeMerchantActivity" android:exported="false" />
+
+        <!-- Customer Home - handles notification when app is running -->
+        <activity
+            android:name=".baseActivities.HomeCustomerActivity"
+            android:launchMode="singleTask"
+            android:exported="true" />
+
+        <!-- Merchant Home - handles notification when app is running -->
+        <activity
+            android:name=".baseActivities.HomeMerchantActivity"
+            android:launchMode="singleTask"
+            android:exported="true" />
+
         <activity android:name=".baseActivities.LoginActivity"
             android:exported="false"
             android:label="Login"
@@ -51,15 +71,28 @@
         <activity android:name=".baseActivities.ProfileActivity"
             android:exported="false"
             android:label="Cravings Home" />
-        <activity android:name=".baseActivities.MainActivity"
+        <activity android:name=".baseActivities.RoleSelectionActivity"
             android:exported="false"
             android:label="Main" />
-        <activity android:name=".baseActivities.EditProductActivity"
-            android:exported="false" />
+
+        <!-- Edit Product - handles stock alert notification -->
+        <activity
+            android:name=".baseActivities.EditProductActivity"
+            android:launchMode="singleTask"
+            android:exported="true" />
+
+        <!-- NEW: Notification Handler Activity - routes notifications when app is killed -->
+        <activity
+            android:name=".baseActivities.NotificationHandlerActivity"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:noHistory="true"
+            android:excludeFromRecents="true" />
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".baseActivities.RoleSelectionActivity"
+            android:name=".baseActivities.MainActivity"
             android:exported="true"
             android:label="Cravings">
             <intent-filter>
