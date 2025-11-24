@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:background="#FFFFFF"
-    tools:context=".baseActivities.EditProductActivity">
+    tools:context=".baseActivities.merchant.EditProductActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

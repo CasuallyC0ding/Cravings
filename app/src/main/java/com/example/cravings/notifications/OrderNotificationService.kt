@@ -9,11 +9,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.cravings.R
-import com.example.cravings.baseActivities.EditProductActivity
-import com.example.cravings.baseActivities.HomeCustomerActivity
-import com.example.cravings.baseActivities.HomeMerchantActivity
-import com.example.cravings.baseActivities.MainActivity
-import com.example.cravings.baseActivities.NotificationHandlerActivity
+import com.example.cravings.baseActivities.customer.HomeCustomerActivity
+import com.example.cravings.baseActivities.merchant.HomeMerchantActivity
+import com.example.cravings.baseActivities.common.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
