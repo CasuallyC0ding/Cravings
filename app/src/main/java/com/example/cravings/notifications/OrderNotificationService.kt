@@ -9,11 +9,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.cravings.R
-import com.example.cravings.baseActivities.EditProductActivity
-import com.example.cravings.baseActivities.HomeCustomerActivity
-import com.example.cravings.baseActivities.HomeMerchantActivity
-import com.example.cravings.baseActivities.MainActivity
-import com.example.cravings.baseActivities.NotificationHandlerActivity
+import com.example.cravings.baseActivities.customer.HomeCustomerActivity
+import com.example.cravings.baseActivities.merchant.HomeMerchantActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -74,12 +71,16 @@ class OrderNotificationService : FirebaseMessagingService() {
             "order_status" -> {
                 Log.d(TAG, "Creating CUSTOMER intent")
                 Intent(this, HomeCustomerActivity::class.java).apply {
+                    // CRITICAL: Add userRole to prevent redirect
+                    putExtra("userRole", "Customer")
                     putExtra("open_orders", true)
                     putExtra("openOrdersTab", true)
                     putExtra("orderId", orderId)
                     putExtra("customerId", customerId)
                     putExtra("status", status)
                     putExtra("type", type)
+                    // CRITICAL: Prevent MainActivity redirect
+                    putExtra("fromNotification", true)
                 }
             }
 
@@ -89,11 +90,13 @@ class OrderNotificationService : FirebaseMessagingService() {
             "new_order", "merchant_status" -> {
                 Log.d(TAG, "Creating MERCHANT intent for $type")
                 Intent(this, HomeMerchantActivity::class.java).apply {
+                    putExtra("userRole", "Merchant")
                     putExtra("open_orders", true)
                     putExtra("orderId", orderId)
                     putExtra("customerId", customerId)
                     putExtra("status", status)
                     putExtra("type", type)
+                    putExtra("fromNotification", true)
                 }
             }
 
@@ -101,37 +104,30 @@ class OrderNotificationService : FirebaseMessagingService() {
             // STOCK ALERT
             // ============================
             "stock_alert" -> {
-                // Route through HomeMerchantActivity to build proper activity stack
                 Intent(this, HomeMerchantActivity::class.java).apply {
+                    putExtra("userRole", "Merchant")
                     putExtra("fromNotification", true)
                     putExtra("open_products", true)
                     putExtra("productId", productIndex)
                     putExtra("productName", productName)
                     putExtra("type", type)
-                    // CRITICAL: These flags ensure proper activity stack
-                    addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                                Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    )
                 }
             }
 
             // Default fallback
             else -> {
-                Log.d(TAG, "Unknown type '$type', using MainActivity fallback")
-                Intent(this, MainActivity::class.java).apply {
+                Log.d(TAG, "Unknown type '$type', using HomeCustomerActivity fallback")
+                Intent(this, HomeCustomerActivity::class.java).apply {
+                    putExtra("userRole", "Customer")
                     putExtra("type", type)
                 }
             }
         }
 
-        // CRITICAL: These flags ensure the app opens correctly when killed
-        intent.addFlags(
-            Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-        )
+        // CRITICAL: These flags ensure the app opens correctly
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         // Unique request code for each notification
         val requestCode = System.currentTimeMillis().toInt()
@@ -147,13 +143,13 @@ class OrderNotificationService : FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            // Full-screen intent for higher priority (optional)
-            .setFullScreenIntent(pendingIntent, true)
+            .setColor(0x28A745) // Green color
             .build()
 
         if (NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()) {
@@ -191,7 +187,7 @@ class OrderNotificationService : FirebaseMessagingService() {
             "https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/"
         ).reference
 
-        // Save to both paths
+        // Try to save to both paths (one will succeed based on actual user type)
         db.child("users").child("Merchant").child(uid).child("fcmToken").setValue(token)
         db.child("users").child("Customer").child(uid).child("fcmToken").setValue(token)
     }

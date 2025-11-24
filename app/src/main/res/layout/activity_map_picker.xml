@@ -4,7 +4,7 @@
     android:id="@+id/mapPickerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".baseActivities.MapPickerActivity">
+    tools:context=".baseActivities.common.MapPickerActivity">
 
     <!-- Map view -->
     <org.osmdroid.views.MapView

@@ -37,53 +37,53 @@
             android:resource="@mipmap/ic_launcher" />
 
         <!-- Activities -->
-        <activity android:name=".baseActivities.VoipActivity" android:exported="false" />
+        <activity android:name=".baseActivities.common.VoipActivity" android:exported="false" />
         <activity android:name=".delivery.DeliveryOrdersActivity" android:exported="false" />
         <activity android:name=".delivery.DeliveryShopsActivity" android:exported="false" />
-        <activity android:name=".baseActivities.CheckoutActivity" android:exported="false" />
-        <activity android:name=".baseActivities.MapPickerActivity" android:exported="false" />
-        <activity android:name=".baseActivities.AddProductActivity" android:exported="false" />
-        <activity android:name=".baseActivities.ProductActivity" android:exported="false" />
-        <activity android:name=".baseActivities.ShopProductsActivity" android:exported="false" />
-        <activity android:name=".baseActivities.CartActivity" android:exported="false" />
+        <activity android:name=".baseActivities.customer.CheckoutActivity" android:exported="false" />
+        <activity android:name=".baseActivities.common.MapPickerActivity" android:exported="false" />
+        <activity android:name=".baseActivities.merchant.AddProductActivity" android:exported="false" />
+        <activity android:name=".baseActivities.merchant.ProductActivity" android:exported="false" />
+        <activity android:name=".baseActivities.customer.ShopProductsActivity" android:exported="false" />
+        <activity android:name=".baseActivities.customer.CartActivity" android:exported="false" />
         <activity android:name=".ShopsActivity" android:exported="false" />
         <activity android:name=".menu" android:exported="false" />
 
         <!-- Customer Home - handles notification when app is running -->
         <activity
-            android:name=".baseActivities.HomeCustomerActivity"
+            android:name=".baseActivities.customer.HomeCustomerActivity"
             android:launchMode="singleTask"
             android:exported="true" />
 
         <!-- Merchant Home - handles notification when app is running -->
         <activity
-            android:name=".baseActivities.HomeMerchantActivity"
+            android:name=".baseActivities.merchant.HomeMerchantActivity"
             android:launchMode="singleTask"
             android:exported="true" />
 
-        <activity android:name=".baseActivities.LoginActivity"
+        <activity android:name=".baseActivities.common.LoginActivity"
             android:exported="false"
             android:label="Login"
             android:theme="@style/Theme.Cravings" />
-        <activity android:name=".baseActivities.SignupActivity"
+        <activity android:name=".baseActivities.common.SignupActivity"
             android:exported="false"
             android:label="Register" />
-        <activity android:name=".baseActivities.ProfileActivity"
+        <activity android:name=".baseActivities.common.ProfileActivity"
             android:exported="false"
             android:label="Cravings Home" />
-        <activity android:name=".baseActivities.RoleSelectionActivity"
+        <activity android:name=".baseActivities.common.RoleSelectionActivity"
             android:exported="false"
             android:label="Main" />
 
         <!-- Edit Product - handles stock alert notification -->
         <activity
-            android:name=".baseActivities.EditProductActivity"
+            android:name=".baseActivities.merchant.EditProductActivity"
             android:launchMode="singleTask"
             android:exported="true" />
 
         <!-- NEW: Notification Handler Activity - routes notifications when app is killed -->
         <activity
-            android:name=".baseActivities.NotificationHandlerActivity"
+            android:name=".baseActivities.common.NotificationHandlerActivity"
             android:launchMode="singleTask"
             android:exported="true"
             android:theme="@android:style/Theme.NoDisplay"
@@ -92,7 +92,7 @@
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".baseActivities.MainActivity"
+            android:name=".baseActivities.common.MainActivity"
             android:exported="true"
             android:label="Cravings">
             <intent-filter>

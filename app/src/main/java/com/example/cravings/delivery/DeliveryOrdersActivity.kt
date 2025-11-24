@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cravings.R
-import com.example.cravings.adapters.DeliveryOrdersAdapter
+import com.example.cravings.adapters.delivery.DeliveryOrdersAdapter
 import com.example.cravings.models.Order
 import com.example.cravings.models.OrderItem
 import com.google.firebase.auth.FirebaseAuth

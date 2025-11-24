@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cravings.R
-import com.example.cravings.adapters.DeliveryShopsAdapter
+import com.example.cravings.adapters.delivery.DeliveryShopsAdapter
 import com.google.firebase.database.*
 
 class DeliveryShopsActivity : AppCompatActivity() {
