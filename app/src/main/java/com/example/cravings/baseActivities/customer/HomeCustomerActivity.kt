@@ -2,6 +2,8 @@ package com.example.cravings.baseActivities.customer
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
@@ -30,11 +32,13 @@ class HomeCustomerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home_customer)
 
         Log.d(TAG, "onCreate called")
+        Log.d(TAG, "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("https://dbcravings-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        userRole = intent.getStringExtra("userRole") ?: "Customer"
+        // CRITICAL: Always use Customer role
+        userRole = "Customer"
 
         tabLayout = findViewById(R.id.tabLayout)
         viewPager = findViewById(R.id.viewPager)
@@ -68,26 +72,45 @@ class HomeCustomerActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.d(TAG, "onNewIntent called")
+        Log.d(TAG, "New intent extras: ${intent.extras?.keySet()?.joinToString()}")
         setIntent(intent)
         handleNotificationIntent(intent)
     }
 
     private fun handleNotificationIntent(intent: Intent) {
         // Log all extras for debugging
-        Log.d(TAG, "handleNotificationIntent - extras: ${intent.extras?.keySet()?.joinToString()}")
+        val extras = intent.extras
+        if (extras != null) {
+            for (key in extras.keySet()) {
+                Log.d(TAG, "Intent Extra - $key: ${extras.get(key)}")
+            }
+        }
 
         val openOrdersTab = intent.getBooleanExtra("openOrdersTab", false)
         val openOrders = intent.getBooleanExtra("open_orders", false)
         val orderId = intent.getStringExtra("orderId")
         val status = intent.getStringExtra("status")
+        val fromNotification = intent.getBooleanExtra("fromNotification", false)
 
-        Log.d(TAG, "openOrdersTab: $openOrdersTab, openOrders: $openOrders, orderId: $orderId, status: $status")
+        Log.d(TAG, "openOrdersTab: $openOrdersTab, openOrders: $openOrders")
+        Log.d(TAG, "orderId: $orderId, status: $status, fromNotification: $fromNotification")
 
         if (openOrdersTab || openOrders) {
             Log.d(TAG, "Opening Orders tab")
-            viewPager.post {
+
+            // Use Handler to ensure ViewPager is ready
+            Handler(Looper.getMainLooper()).postDelayed({
                 viewPager.currentItem = 1  // Orders tab
-            }
+                Log.d(TAG, "Orders tab set to index 1")
+            }, 100) // Small delay to ensure ViewPager is initialized
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume called")
+
+        // Re-check intent in case it was updated
+        handleNotificationIntent(intent)
     }
 }
