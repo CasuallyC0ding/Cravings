@@ -114,15 +114,22 @@ class MainActivity : ComponentActivity() {
                 }
 
                 // ============================
-                // STOCK ALERT
+                // STOCK ALERT - FIXED
                 // ============================
                 "stock_alert" -> {
                     Log.d(TAG, "Opening HomeMerchantActivity for stock_alert")
+                    // Get both productIndex and productId (they might be in either key)
+                    val productId = extras.getString("productId") ?: extras.getString("productIndex") ?: ""
+                    val productName = extras.getString("productName") ?: ""
+
+                    Log.d(TAG, "Stock Alert - productId: $productId, productName: $productName")
+
                     val targetIntent = Intent(this, HomeMerchantActivity::class.java).apply {
                         putExtra("userRole", "Merchant")
                         putExtra("open_products", true)
-                        putExtra("productId", extras.getString("productId"))
-                        putExtra("productName", extras.getString("productName"))
+                        putExtra("productId", productId)
+                        putExtra("productName", productName)
+                        putExtra("type", "stock_alert")
                         putExtra("fromNotification", true)
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }

@@ -155,12 +155,12 @@ class HomeMerchantActivity : AppCompatActivity() {
                 }
             }
             openProducts || type == "stock_alert" -> {
-                Log.d(TAG, "Opening Products tab")
+                Log.d(TAG, "Opening Products tab for stock alert")
                 viewPager.post {
                     viewPager.currentItem = 0  // Products tab
                 }
 
-                // If from stock alert, wait a bit then launch EditProductActivity
+                // If from stock alert, show toast and navigate to the specific product
                 if (fromNotification && type == "stock_alert" && !productId.isNullOrEmpty()) {
                     Log.d(TAG, "Stock alert - productId: $productId, productName: $productName")
 
@@ -171,14 +171,15 @@ class HomeMerchantActivity : AppCompatActivity() {
                             Toast.LENGTH_LONG
                         ).show()
 
-                        // Open EditProductActivity from within the app context
+                        // Navigate to EditProductActivity with the product details
                         val editIntent = Intent(this, EditProductActivity::class.java).apply {
                             putExtra("productId", productId)
                             putExtra("productName", productName)
+                            putExtra("fromStockAlert", true)
                             putExtra("fromNotification", true)
                         }
                         startActivity(editIntent)
-                    }, 1000) // Delay to allow Products tab to load first
+                    }, 500) // Delay to allow Products tab to load and show toast
                 }
             }
         }

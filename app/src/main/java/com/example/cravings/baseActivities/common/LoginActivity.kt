@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
 import com.example.cravings.R
 import com.example.cravings.baseActivities.customer.HomeCustomerActivity
 import com.example.cravings.baseActivities.merchant.HomeMerchantActivity
